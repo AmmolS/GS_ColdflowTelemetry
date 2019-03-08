@@ -1,5 +1,5 @@
 # Telemetry
-Telemetry Program for Arduino and DAQ
+This program interprets data retrieved from the Arduino and DAQ, and sends this data to a JSON file.
 
 # External Libraries
 Arduino serial communication library was retrieved from:
