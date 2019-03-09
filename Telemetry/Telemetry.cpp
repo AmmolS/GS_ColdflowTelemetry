@@ -32,7 +32,7 @@ char incomingData[MAX_DATA_LENGTH];
 
 void update_filename(vector<string> fileNames) {
 	// Create new JSON file (or truncate existing contents)
-	std::ofstream jsFile("JSFileName/FileList.json", std::ofstream::trunc);
+	std::ofstream jsFile("Output/JSFileName/FileList.json", std::ofstream::trunc);
 
 	Json::Value data;
 	Json::Value name(Json::arrayValue);
