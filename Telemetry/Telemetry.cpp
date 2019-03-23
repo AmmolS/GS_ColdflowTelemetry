@@ -1,4 +1,5 @@
-﻿#define BOARD_NUM 0
+﻿#define AMBIENT_PRESSURE 14.696
+#define BOARD_NUM 0
 
 #include <iostream>
 #include <stdio.h>
@@ -126,20 +127,65 @@ void write_to_JSON(vector<string> time, vector<double> T1, vector<double> T2, ve
 	data["Arduino"]["Load Cell"] = "test";
 
 	std::ofstream ofs("Output/" + time.back(), std::ofstream::app);
-
 	ofs << data << std::flush;
 	ofs.close();
+}
+
+void calibrate_daq(float *slope, float *constant, int lowChan, int highChan) {
+	string response;
+	float ambientVoltage;
+	bool validChannel = false;
+	bool calibrated = false;
+
+	do {
+		try {
+			cout << "Enter a voltage value to set as ambient voltage or y to use current received voltage on a specific channel: ";
+			cin >> response;
+			if (response == "y") {
+				string channel;
+				do {
+					try {
+						do {
+							cout << "Pick a channel between 0 and 7: ";
+							cin >> channel;
+						} while (stoi(channel) > 7 || stoi(channel) < 0);
+						validChannel = true;
+					}
+					catch (invalid_argument e) {
+						cout << "Invalid input." << endl;
+					}
+				} while (!validChannel);
+
+				cbVIn(BOARD_NUM, stof(channel), BIP10VOLTS, &ambientVoltage, 0);
+				*slope = (1000 - AMBIENT_PRESSURE) / (10 - ambientVoltage);
+				*constant = 1000 - (*slope) * 10;
+				cout << "DAQ calibrated with " << ambientVoltage << " V as ambient pressure voltage." << endl;
+				calibrated = true;
+			}
+			else {
+				*slope = (1000 - AMBIENT_PRESSURE) / (10 - stof(response));
+				*constant = 1000 - (*slope) * 10;
+				cout << "DAQ calibrated with " << response << " V as ambient pressure voltage." << endl;
+				calibrated = true;
+			}
+		}
+		catch (invalid_argument e) {
+			cout << "Invalid input." << endl;
+		}
+	} while (!calibrated);
+	
 }
 
 int main()
 {
 	// MCC board setup
-	int BoardNum = 0;
 	int Gain = BIP10VOLTS;
-	unsigned short Data = 0;
+	float Data = 0;
 	float EngUnits = 0;
 	double pressureKP = 0;
 	short BoardStatus;
+	int lowChan = 0;
+	int highChan = 0;
 
 	// MCC sampling
 	long Count = 18; // Total number of samples to be collected (6 samples * 3 channels)
@@ -154,6 +200,10 @@ int main()
 
 	SerialPort arduino(port_name);
 
+	float slope = 50;
+	float constant = 500;
+	
+
 	if (!arduino.isConnected()) {
 		cout << "Arduino is not connected." << endl;
 	}
@@ -163,16 +213,51 @@ int main()
 	}
 
 	// Scan channels 0 to 2 on DAQ
-	BoardStatus = cbAInScan(BoardNum, 0, 2, Count, &Rate, Gain, MemHandle, CONVERTDATA);
+	BoardStatus = cbVIn(BOARD_NUM, lowChan, Gain, &Data, 0);
+
+	//BoardStatus = cbAInScan(BOARD_NUM, lowChan, highChan, Count, &Rate, Gain, MemHandle, CONVERTDATA);
 	
 	if (BoardStatus == 343) {
-		cout << "MCC DAQ is not connected. Code: " << BoardStatus << endl;
+		cout << "MCC DAQ is not connected (Code " << BoardStatus << ")." << endl;
 	}
 	else if (BoardStatus != 0) {
 		cout << "Error with MCC DAQ. Code: " << BoardStatus << endl;
 	}
 	else {
+		bool validRange = false;
 		cout << "Connection established with MCC DAQ." << endl;
+		cout << "Setting the lower and higher number of channels used (max. range of 3 channels)" << endl;
+		do {
+			try {
+				cout << "Enter the lower channel: ";
+				string lowChanStr;
+				cin >> lowChanStr;
+				lowChan = stoi(lowChanStr);
+
+				cout << "Enter the higher channel: ";
+				string highChanStr;
+				cin >> highChanStr;
+				highChan = stoi(highChanStr);
+			}
+			catch (invalid_argument e) {
+				cout << "Invalid channel input." << endl;
+			}
+			if (highChan - lowChan != 2) {
+				cout << "Range of channels must be 3 and higher channel must be greater than lower channel." << endl;
+			}
+			else {
+				validRange = true;
+			}
+		} while (!validRange);
+
+		BoardStatus = cbAInScan(BOARD_NUM, lowChan, highChan, Count, &Rate, Gain, MemHandle, CONVERTDATA);
+		cout << "Calibrate DAQ voltage (y for yes)? (By default, -10 V is 0 KP): ";
+		string response;
+		cin >> response;
+		if (response == "y") {
+			calibrate_daq(&slope, &constant, lowChan, highChan);
+		}
+
 	}
 
 	clock_t time = clock();
@@ -224,9 +309,8 @@ int main()
 			printf("MCC: \n");
 			for (int i = 0; (i < 18); i++)
 			{
-				cbToEngUnits(BoardNum, Gain, ADData[i], &EngUnits);
-				//pressureKP = 250 * EngUnits - 250; // +1V to +5V range
-				pressureKP = 50 * EngUnits + 500; // -10V to +10V range
+				cbToEngUnits(BOARD_NUM, Gain, ADData[i], &EngUnits);
+				pressureKP = slope * EngUnits + constant; // -10V to +10V range
 				printf("%4u, %fV, %lfP\n", ADData[i], EngUnits, pressureKP);
 				pressure.push_back(pressureKP);
 			}
