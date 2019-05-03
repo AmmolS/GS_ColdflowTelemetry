@@ -353,7 +353,7 @@ int main()
 	vector<string> channelUnits(8, "");
 	vector<vector<float>> linearCalibration(8, vector<float>(2));
 
-	for (int i = 0; i < linearCalibration.size(); i++) {
+	for (size_t i = 0; i < linearCalibration.size(); i++) {
 		linearCalibration[i][0] = 50;
 		linearCalibration[i][1] = 500;
 	}
