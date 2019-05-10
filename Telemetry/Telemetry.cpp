@@ -26,12 +26,6 @@
 
 using namespace std;
 
-// Arduino portname
-const char *port_name = "\\\\.\\COM4";
-
-//String for incoming data from Arduino
-char incomingData[MAX_DATA_LENGTH];
-
 void update_filename(vector<string> fileNames) {
 	// Create new JSON file (or truncate existing contents)
 	std::ofstream jsFile("Output/JSFileName/FileList.json", std::ofstream::trunc);
@@ -194,6 +188,30 @@ void write_to_JSON(vector<string> time, vector<double> T1, vector<double> T2, ve
 	ofs.close();
 }
 
+int set_arduino_port_num() {
+	string response;
+	int COMPortNum;
+	bool validPort = false;
+
+	do {
+		try {
+			cout << "Enter an integer for the COM Port connected to the Arduino: ";
+			cin >> response;
+			COMPortNum = stoi(response);
+			if (COMPortNum < 0) {
+				cout << "Port number should be positive." << endl;
+			}
+			else {
+				validPort = true;
+			}
+		}
+		catch (invalid_argument e) {
+			cout << "Invalid input." << endl;
+		}
+	} while (!validPort);
+	return  COMPortNum;
+}
+
 void set_daq_units(int lowChan, int highChan, vector<string> *units) {
 	string response;
 	bool unitSet = false;
@@ -254,8 +272,6 @@ void set_daq_units(int lowChan, int highChan, vector<string> *units) {
 			cout << "Enter KP, C, N, L/s, or y: ";
 		}
 	}while (response != "KP" && response != "C" && response != "N" && response != "L/s" && response != "y");
-
-	
 }
 
 
@@ -330,7 +346,6 @@ void calibrate_daq(int lowChan, int highChan, vector<string> units, vector<vecto
 		} while (!calibrated);
 		channelNum++;
 	} while (channelNum <= highChan);
-		
 }
 
 int main()
@@ -362,6 +377,13 @@ int main()
 	vector<double> T2;
 	vector<double> DAQData;
 	vector<string> fileNames;
+
+	// Arduino portname
+	string port_string = "\\\\.\\COM" + to_string(set_arduino_port_num());
+	const char *port_name = port_string.c_str();
+
+	//String for incoming data from Arduino
+	char incomingData[MAX_DATA_LENGTH];
 
 	SerialPort arduino(port_name);
 
@@ -404,7 +426,6 @@ int main()
 				else {
 					validRange = true;
 				}
-
 			}
 			catch (invalid_argument e) {
 				cout << "Invalid channel input." << endl;
@@ -418,6 +439,7 @@ int main()
 		ADData = (WORD*)MemHandle;
 
 		BoardStatus = cbAInScan(BOARD_NUM, lowChan, highChan, Count, &Rate, Gain, MemHandle, CONVERTDATA);
+
 		set_daq_units(lowChan, highChan, &channelUnits);
 
 		cout << "\nCalibrate DAQ voltage (y for yes)? (By default, -10 V is 0 units): ";
@@ -426,12 +448,11 @@ int main()
 		if (response == "y") {
 			calibrate_daq(lowChan, highChan, channelUnits, &linearCalibration);
 		}
-
 	}
 
 	clock_t time = clock();
-	while (!_kbhit() && (arduino.isConnected() || BoardStatus == 0)) {
-
+	while (!(GetAsyncKeyState(VK_ESCAPE) & 1) && (arduino.isConnected() || BoardStatus == 0)) {
+		cout << "Press the ESC key to end the program." << endl;
 
 		if (arduino.isConnected()) {
 			//Check if data has been read or not
@@ -452,7 +473,6 @@ int main()
 					T1.push_back(-999);
 				}
 
-
 				if (thermocouple.find("T2") != string::npos && thermocouple.length() > thermocouple.find("T2") + 7)
 				{
 					T2.push_back(stod(thermocouple.substr(thermocouple.find("T2") + 3, 5)));
@@ -461,9 +481,7 @@ int main()
 				{
 					T2.push_back(-999);
 				}
-
 			}
-
 		}
 
 		// Force vector to have size of 6
@@ -474,7 +492,7 @@ int main()
 		while (T2.size() <= 6) {
 			T2.push_back(-999);
 		}
-		
+
 		if (BoardStatus == 0) {
 			printf("MCC: \n");
 			for (int i = 0; (i < Count); i++)
@@ -483,8 +501,6 @@ int main()
 				finalUnit = linearCalibration[i/6 + lowChan][0] *EngUnits + linearCalibration[i/6 + lowChan][1]; // -10V to +10V range
 
 				cout << ADData[i] << ", " << EngUnits << "V, " << finalUnit << channelUnits.at(i/6 + lowChan) << endl;
-
-				//printf("%4u, %fV, %lf, %s\n", ADData[i], EngUnits, finalUnit, channelUnits.at(Count&6));
 				DAQData.push_back(finalUnit);
 			}
 		}
@@ -510,10 +526,10 @@ int main()
 		// Wait 0.5 seconds (time between each file write operation)
 		Sleep(500);
 	}
+
 	// Remove files in Output folder
 	for (size_t i = 0; i < fileNames.size(); ++i) {
 		remove(("Output/" + fileNames.at(i)).c_str());
 	}
-
 	return 0;
 }
