@@ -518,7 +518,13 @@ int main()
 				// Find all valid numbers in received string and push them to temperature vector
 				if (thermocouple.find("T1") != string::npos && thermocouple.length() > thermocouple.find("T1") + 7)
 				{
-					T1.push_back(stod(thermocouple.substr(thermocouple.find("T1") + 3, 5)));
+					try {
+						T1.push_back(stod(thermocouple.substr(thermocouple.find("T1") + 3, 5)));
+					}
+					catch (invalid_argument e) {
+						T1.push_back(-999);
+					}
+					
 				}
 				else
 				{
@@ -527,7 +533,13 @@ int main()
 
 				if (thermocouple.find("T2") != string::npos && thermocouple.length() > thermocouple.find("T2") + 7)
 				{
-					T2.push_back(stod(thermocouple.substr(thermocouple.find("T2") + 3, 5)));
+					try {
+						T2.push_back(stod(thermocouple.substr(thermocouple.find("T2") + 3, 5)));
+					}
+					catch (invalid_argument e) {
+						T2.push_back(-999);
+					}
+					
 				}
 				else
 				{
@@ -577,7 +589,7 @@ int main()
 		T2.clear();
 
 		// Wait 0.5 seconds (time between each file write operation)
-		Sleep(500);
+		Sleep(100);
 	}
 	string response;
 	if (arduino.isConnected() || BoardStatus == 0) {
