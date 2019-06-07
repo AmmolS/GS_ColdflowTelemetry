@@ -28,14 +28,14 @@ using namespace std;
 
 void update_filename(vector<string> fileNames) {
 	// Create new JSON file (or truncate existing contents)
-	std::ofstream jsFile("Output/JSFileName/FileList.json", std::ofstream::trunc);
+	std::ofstream jsFile("Output/JSON/JSFileName/FileList.json", std::ofstream::trunc);
 
 	Json::Value data;
 	Json::Value name(Json::arrayValue);
 
 	// Add file names to JSON file
 	for (size_t i = 0; i < fileNames.size(); i++) {
-		name.append(fileNames.at(i));
+		name.append(fileNames.at(i) + "ms");
 	}
 	
 	data["File Name"] = name;
@@ -183,9 +183,55 @@ void write_to_JSON(vector<string> time, vector<double> T1, vector<double> T2, ve
 	data["Arduino"]["Thermocouple4"] = tc4;
 	data["Arduino"]["Load Cell"] = "test";
 
-	std::ofstream ofs("Output/" + time.back(), std::ofstream::app);
+	std::ofstream ofs("Output/JSON/" + time.back() + "ms.json", std::ofstream::app);
 	ofs << data << std::flush;
 	ofs.close();
+}
+
+void write_to_csv(vector<string> time, vector<double> T1, vector<double> T2, vector<double> DAQData, vector<string> channelUnits, int lowChan) {
+	std::ofstream ofs("Output/CSV/" + time.back() + "ms.csv", std::ofstream::app);
+	ofs << "Arduino" << endl;
+	ofs << "Thermocouple,Data 1,Data 2,Data 3,Data 4,Data 5,Data 6" << endl;
+	ofs << "1," << to_string(T1.at(1)) << "," << to_string(T1.at(2)) << "," << to_string(T1.at(3)) << "," << to_string(T1.at(4)) << "," << to_string(T1.at(5)) << "," << to_string(T1.at(6)) << endl;
+	ofs << "2," << to_string(T2.at(1)) << "," << to_string(T2.at(2)) << "," << to_string(T2.at(3)) << "," << to_string(T2.at(4)) << "," << to_string(T2.at(5)) << "," << to_string(T2.at(6)) << endl;
+
+	ofs << "DAQ\n";
+	ofs << "Port,Unit,Data 1,Data 2,Data 3,Data 4,Data 5,Data 6\n";
+
+	if (DAQData.size() >= 6) {
+		ofs << to_string(lowChan) << "," << channelUnits.at(lowChan) << "," << DAQData.at(0) << "," << DAQData.at(1) << "," << DAQData.at(2) << "," << DAQData.at(3) << "," << DAQData.at(4) << "," << DAQData.at(5) << endl;
+	}
+
+	if (DAQData.size() >= 12) {
+		ofs << to_string(lowChan + 1) << "," << channelUnits.at(lowChan + 1) << "," << DAQData.at(6) << "," << DAQData.at(7) << "," << DAQData.at(8) << "," << DAQData.at(9) << "," << DAQData.at(10) << "," << DAQData.at(11) << endl;
+	}
+
+	if (DAQData.size() >= 18) {
+		ofs << to_string(lowChan + 2) << "," << channelUnits.at(lowChan + 2) << "," << DAQData.at(12) << "," << DAQData.at(13) << "," << DAQData.at(14) << "," << DAQData.at(15) << "," << DAQData.at(16) << "," << DAQData.at(17) << endl;
+	}
+
+	if (DAQData.size() >= 24) {
+		ofs << to_string(lowChan + 3) << "," << channelUnits.at(lowChan + 3) << "," << DAQData.at(18) << "," << DAQData.at(19) << "," << DAQData.at(20) << "," << DAQData.at(21) << "," << DAQData.at(22) << "," << DAQData.at(23) << endl;
+	}
+
+	if (DAQData.size() >= 30) {
+		ofs << to_string(lowChan + 4) << "," << channelUnits.at(lowChan + 4) << "," << DAQData.at(24) << "," << DAQData.at(25) << "," << DAQData.at(26) << "," << DAQData.at(27) << "," << DAQData.at(28) << "," << DAQData.at(29) << endl;
+	}
+
+	if (DAQData.size() >= 36) {
+		ofs << to_string(lowChan + 5) << "," << channelUnits.at(lowChan + 5) << "," << DAQData.at(30) << "," << DAQData.at(31) << "," << DAQData.at(32) << "," << DAQData.at(33) << "," << DAQData.at(34) << "," << DAQData.at(35) << endl;
+	}
+
+	if (DAQData.size() >= 42) {
+		ofs << to_string(lowChan + 6) << "," << channelUnits.at(lowChan + 6) << "," << DAQData.at(36) << "," << DAQData.at(37) << "," << DAQData.at(38) << "," << DAQData.at(39) << "," << DAQData.at(40) << "," << DAQData.at(41) << endl;
+	}
+
+	if (DAQData.size() >= 48) {
+		ofs << to_string(lowChan + 7) << "," << channelUnits.at(lowChan + 7) << "," << DAQData.at(42) << "," << DAQData.at(43) << "," << DAQData.at(44) << "," << DAQData.at(45) << "," << DAQData.at(46) << "," << DAQData.at(47) << endl;
+	}
+
+	ofs.close();
+
 }
 
 int set_arduino_port_num() {
@@ -284,7 +330,7 @@ void calibrate_daq(int lowChan, int highChan, vector<string> units, vector<vecto
 	bool calibrated = false;
 
 	int channelNum = lowChan;
-	cout << "An inputted unit will be calibrated with an inputted voltage (ex. -14.696 KP at -10 V)." << endl;
+	cout << "An inputted unit will be calibrated with an inputted voltage (ex. 14.696 KP at -10 V)." << endl;
 
 	do {
 		do {
@@ -450,9 +496,15 @@ int main()
 		}
 	}
 
+	if (arduino.isConnected() || BoardStatus == 0) {
+		cout << "Press the ESC key at any time to end data collection." << endl;
+		Sleep(1500);
+	}
+	
+
 	clock_t time = clock();
 	while (!(GetAsyncKeyState(VK_ESCAPE) & 1) && (arduino.isConnected() || BoardStatus == 0)) {
-		cout << "Press the ESC key to end the program." << endl;
+		cout << "Press the ESC key to end data collection." << endl;
 
 		if (arduino.isConnected()) {
 			//Check if data has been read or not
@@ -515,8 +567,9 @@ int main()
 			printf("%s", incomingData);
 		}
 
-		fileNames.push_back(to_string(clock() - time) + "ms.json");
+		fileNames.push_back(to_string(clock() - time));
 		write_to_JSON(fileNames, T1, T2, DAQData, channelUnits, lowChan);
+		write_to_csv(fileNames, T1, T2, DAQData, channelUnits, lowChan);
 		update_filename(fileNames);
 
 		DAQData.clear();
@@ -526,10 +579,26 @@ int main()
 		// Wait 0.5 seconds (time between each file write operation)
 		Sleep(500);
 	}
-
-	// Remove files in Output folder
-	for (size_t i = 0; i < fileNames.size(); ++i) {
-		remove(("Output/" + fileNames.at(i)).c_str());
+	string response;
+	if (arduino.isConnected() || BoardStatus == 0) {
+		do {
+			cout << "Save collected data? Enter y or n: ";
+			cin >> response;
+			if (response == "n") {
+				// Remove files in Output folder
+				for (size_t i = 0; i < fileNames.size(); ++i) {
+					remove(("Output/JSON/" + fileNames.at(i) + "ms.json").c_str());
+					remove(("Output/CSV/" + fileNames.at(i) + "ms.csv").c_str());
+				}
+			}
+			else if (response == "y") {
+				cout << endl << "Files saved in:" << endl;
+				cout << "Output/JSON/" << endl;
+				cout << "Output/CSV/" << endl;
+				cout << "Please move or delete the json and csv files before running the program again." << endl;
+			}
+		} while (response != "y" && response != "n");
 	}
+	
 	return 0;
 }
