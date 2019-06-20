@@ -1,14 +1,19 @@
 ﻿#define AMBIENT_PRESSURE 14.696
 #define BOARD_NUM 0
 
+#include "MCCDAQ.h"
+#include "SerialPort.h"
+//#include "cbw.h"
+
+#include <jsoncpp.cpp> // include from dist in project folder
+#include <json/json.h>
+#include <json/json-forwards.h>
+
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
-#include "SerialPort.h"
-#include "cbw.h"
 #include <algorithm>
-
 #include <conio.h>
 #include <fstream>
 #include <iomanip>
@@ -19,10 +24,6 @@
 #include <windows.h>
 #include <time.h>
 #include <vector>
-
-#include <jsoncpp.cpp> // include from dist in project folder
-#include <json/json.h>
-#include <json/json-forwards.h>
 
 using namespace std;
 
@@ -43,7 +44,6 @@ void update_filename(vector<string> fileNames) {
 	jsFile << data << std::flush;
 	jsFile.close();
 }
-
 
 void write_to_JSON(vector<string> time, vector<double> T1, vector<double> T2, vector<double> DAQData, vector<string> channelUnits, int lowChan) {
 
@@ -234,7 +234,7 @@ void write_to_csv(vector<string> time, vector<double> T1, vector<double> T2, vec
 
 }
 
-int set_arduino_port_num() {
+string set_arduino_port_num() {
 	string response;
 	int COMPortNum;
 	bool validPort = false;
@@ -255,177 +255,23 @@ int set_arduino_port_num() {
 			cout << "Invalid input." << endl;
 		}
 	} while (!validPort);
-	return  COMPortNum;
-}
+	string port_string = "\\\\.\\COM" + to_string(COMPortNum);
 
-void set_daq_units(int lowChan, int highChan, vector<string> *units) {
-	string response;
-	bool unitSet = false;
-	
-	cout << "\nTo set all the channels to the same unit, enter one of the units below. To set each channel individually, enter y." << endl;
-	cout << "KP for Pressure (kilopsi)" << endl;
-	cout << "C for Temperature (Celsius)" << endl;
-	cout << "N for Force (Newtons)" << endl;
-	cout << "L/s for Flow Rate (Litres/second)" << endl;
-	cout << "Chosen unit: ";
-
-	do {
-		cin >> response;
-
-		if (response == "KP") {
-			fill(units->begin(), units->end(), "KP");
-			cout << "Channels " << lowChan << " to " << highChan << " set to Pressure." << endl;
-			return;
-		}
-		else if (response == "C") {
-			fill(units->begin(), units->end(), "C");
-			cout << "Channels " << lowChan << " to " << highChan << " set to Temperature." << endl;
-			return;
-		}
-		else if (response == "N") {
-			fill(units->begin(), units->end(), "N");
-			cout << "Channels " << lowChan << " to " << highChan << " set to Force." << endl;
-			return;
-		}
-		else if (response == "L/s") {
-			fill(units->begin(), units->end(), "L/s");
-			cout << "Channels " << lowChan << " to " << highChan << " set to Flow Rate." << endl;
-			return;
-		}
-		else if (response == "y") {
-			cout << endl << "Setting each channel individually..." << endl;
-			cout << "For each channel, enter:" << endl;
-			cout << "KP for Pressure (kilopsi)" << endl;
-			cout << "C for Temperature (Celsius)" << endl;
-			cout << "N for Force (Newtons)" << endl;
-			cout << "L/s for Flow Rate (Litres/second)" << endl;
-
-			int channel = lowChan;
-			do {
-				cout << "Channel " << channel << ": ";
-				cin >> response;
-				if (response == "KP" || response == "C" || response == "N" || response == "L/s") {
-					units->at(channel) = response;
-					channel++;
-				}
-				else {
-					cout << "Enter KP, C, N, or L/s." << endl;
-				}
-			} while (channel <= highChan);
-			return;
-		}
-		else {
-			cout << "Enter KP, C, N, L/s, or y: ";
-		}
-	}while (response != "KP" && response != "C" && response != "N" && response != "L/s" && response != "y");
-}
-
-
-void calibrate_daq(int lowChan, int highChan, vector<string> units, vector<vector<float>> *linearCalibration) {
-	string response;
-	float calibratedVoltage;
-	float calibratedUnit;
-	bool validChannel = false;
-	bool validUnit = false;
-	bool calibrated = false;
-
-	int channelNum = lowChan;
-	cout << "An inputted unit will be calibrated with an inputted voltage (ex. 14.696 KP at -10 V)." << endl;
-
-	do {
-		do {
-			try {
-				cout << "Calibrating channel " << channelNum << "..." << endl;
-				if (units.at(channelNum) == "KP") {
-					cout << "Enter a value for pressure: ";
-				}
-				if (units.at(channelNum) == "C") {
-					cout << "Enter a value for temperature: ";
-				}
-				if (units.at(channelNum) == "N") {
-					cout << "Enter a value for force: ";
-				}
-				if (units.at(channelNum) == "L/s") {
-					cout << "Enter a value for flow rate: ";
-				}
-				cin >> response;
-				calibratedUnit = stof(response);
-				validUnit = true;
-			}
-			catch (invalid_argument e) {
-				cout << "Invalid input." << endl;
-			}
-		} while (!validUnit);
-
-		string unitType;
-
-		do {
-			try {
-				cout << "Enter the corresponding voltage value: ";
-				cin >> response;
-				calibratedVoltage = stof(response);
-
-				if (units.at(channelNum) == "KP") {
-					unitType = "KP";
-				}
-				else if (units.at(channelNum) == "C") {
-					unitType = "C";
-				}
-
-				else if (units.at(channelNum) == "N") {
-					unitType = "N";
-				}
-
-				else if (units.at(channelNum) == "L/s") {
-					unitType = "L/s";
-				}
-
-				linearCalibration->at(channelNum).at(0) = (1000 - calibratedUnit) / (10 - calibratedVoltage);
-				linearCalibration->at(channelNum).at(1) = 1000 - (linearCalibration->at(channelNum).at(0) * 10);
-
-				cout << "Channel " << channelNum << " calibrated with " << calibratedUnit << " " << unitType << " and " << calibratedVoltage << " V." << endl << endl;
-				calibrated = true;
-			}
-			catch (invalid_argument e) {
-				cout << "Invalid input." << endl;
-			}
-		} while (!calibrated);
-		channelNum++;
-	} while (channelNum <= highChan);
+	return port_string;
 }
 
 int main()
 {
-	// MCC board setup
-	int Gain = BIP10VOLTS;
-	float Data = 0;
-	float EngUnits = 0;
-	double finalUnit = 0;
+	// Set up DAQ
+	MCCDAQ daq(BIP10VOLTS, 0, 0, 6, 100000);
 	short BoardStatus;
-	int lowChan = 0;
-	int highChan = 0;
-
-	// MCC sampling
-	long Count = 6; // Total number of samples to be collected (6 samples * # of channels)
-	long Rate = 100000; // Rate that samples are collected per channel
-	HANDLE MemHandle = cbWinBufAlloc(Count);
-	WORD *ADData = (WORD*)MemHandle;
-
-	vector<string> channelUnits(8, "");
-	vector<vector<float>> linearCalibration(8, vector<float>(2));
-
-	for (size_t i = 0; i < linearCalibration.size(); i++) {
-		linearCalibration[i][0] = 50;
-		linearCalibration[i][1] = 500;
-	}
 
 	vector<double> T1;
 	vector<double> T2;
-	vector<double> DAQData;
 	vector<string> fileNames;
 
 	// Arduino portname
-	string port_string = "\\\\.\\COM" + to_string(set_arduino_port_num());
+	string port_string = set_arduino_port_num();
 	const char *port_name = port_string.c_str();
 
 	//String for incoming data from Arduino
@@ -438,61 +284,38 @@ int main()
 	}
 	else {
 		cout << "Connection established with Arduino." << endl;
-		Sleep(3000); // Give time to initialize Arduino
+		//Sleep(3000); // Give time to initialize Arduino
 	}
 
 	// Get a sample value on port 0 to check if DAQ is connected
-	BoardStatus = cbVIn(BOARD_NUM, lowChan, Gain, &Data, 0);
+	BoardStatus = daq.get_board_status_single_port();
 
 	if (BoardStatus == 343) {
-		cout << "MCC DAQ is not connected (Code " << BoardStatus << ")." << endl;
+		cout << endl << "MCC DAQ is not connected (Code " << BoardStatus << ")." << endl;
+		cout << "Press any key to continue." << endl;
+		getch();
 	}
 	else if (BoardStatus != 0) {
-		cout << "Error with MCC DAQ. Code: " << BoardStatus << endl;
+		cout << endl << "Error with MCC DAQ. Code: " << BoardStatus << endl;
+		cout << "Press any key to continue." << endl;
+		getch();
 	}
 	else {
 		bool validRange = false;
-		cout << "Connection established with MCC DAQ." << endl;
-		cout << endl << "Setting the lower and higher number of DAQ channels used (max. range of 7 channels)" << endl;
-		do {
-			try {
-				cout << "Enter the lower channel: ";
-				string lowChanStr;
-				cin >> lowChanStr;
-				lowChan = stoi(lowChanStr);
+		cout << endl << "Connection established with MCC DAQ." << endl;
+		cout << "Press any key to continue." << endl;
+		getch();
+		daq.set_daq_ports();
 
-				cout << "Enter the higher channel: ";
-				string highChanStr;
-				cin >> highChanStr;
-				highChan = stoi(highChanStr);
+		BoardStatus = daq.get_board_status_multiple_ports();
 
-				if (highChan > 7 || lowChan < 0 || highChan - lowChan < 0 || highChan - lowChan > 7) {
-					cout << "Range of channels must be between 1 and 7, and higher channel must be greater than (or equal to for a single channel) lower channel." << endl;
-				}
-				else {
-					validRange = true;
-				}
-			}
-			catch (invalid_argument e) {
-				cout << "Invalid channel input." << endl;
-			}
-		} while (!validRange);
-
-		// MCC sampling
-		Count = 6 * (highChan - lowChan + 1); // Total number of samples to be collected (6 samples * # of channels)
-		Rate = 100000/(highChan - lowChan + 1); // Rate that samples are collected per channel
-		MemHandle = cbWinBufAlloc(Count);
-		ADData = (WORD*)MemHandle;
-
-		BoardStatus = cbAInScan(BOARD_NUM, lowChan, highChan, Count, &Rate, Gain, MemHandle, CONVERTDATA);
-
-		set_daq_units(lowChan, highChan, &channelUnits);
+		daq.set_daq_units();
 
 		cout << "\nCalibrate DAQ voltage (y for yes)? (By default, -10 V is 0 units): ";
 		string response;
 		cin >> response;
 		if (response == "y") {
-			calibrate_daq(lowChan, highChan, channelUnits, &linearCalibration);
+			daq.calibrate_daq();
 		}
 	}
 
@@ -557,38 +380,25 @@ int main()
 			T2.push_back(-999);
 		}
 
-		if (BoardStatus == 0) {
-			printf("MCC: \n");
-			for (int i = 0; (i < Count); i++)
-			{
-				cbToEngUnits(BOARD_NUM, Gain, ADData[i], &EngUnits);
-				finalUnit = linearCalibration[i/6 + lowChan][0] *EngUnits + linearCalibration[i/6 + lowChan][1]; // -10V to +10V range
+		fileNames.push_back(to_string(clock() - time));
 
-				cout << ADData[i] << ", " << EngUnits << "V, " << finalUnit << channelUnits.at(i/6 + lowChan) << endl;
-				DAQData.push_back(finalUnit);
-			}
-		}
-		else {
-			for (int i = 0; i < Count; i++) {
-				DAQData.push_back(-999);
-			}
-		}
+		daq.print_data(fileNames);
 
 		if (arduino.isConnected()) {
 			printf("\nArduino: \n");
 			printf("%s", incomingData);
 		}
 
-		fileNames.push_back(to_string(clock() - time));
-		write_to_JSON(fileNames, T1, T2, DAQData, channelUnits, lowChan);
-		write_to_csv(fileNames, T1, T2, DAQData, channelUnits, lowChan);
+		
+		write_to_JSON(fileNames, T1, T2, daq.get_daq_data(), daq.get_channel_units(), daq.get_low_chan());
+		write_to_csv(fileNames, T1, T2, daq.get_daq_data(), daq.get_channel_units(), daq.get_low_chan());
 		update_filename(fileNames);
 
-		DAQData.clear();
+		daq.clear_daq_data();
 		T1.clear();
 		T2.clear();
 
-		// Wait 0.5 seconds (time between each file write operation)
+		// Wait 0.1 seconds (time between each file write operation)
 		Sleep(100);
 	}
 	string response;

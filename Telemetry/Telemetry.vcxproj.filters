@@ -18,7 +18,10 @@
     <ClCompile Include="SerialPort.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Telemetry.cpp">
+    <ClCompile Include="MCCDAQ.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GS_ColdflowTelemetry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -27,6 +30,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="cbw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MCCDAQ.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
