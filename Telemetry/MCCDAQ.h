@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <numeric>
+#include <math.h>
 
 #define BOARD_NUM 0
 

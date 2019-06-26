@@ -14,8 +14,8 @@ MCCDAQ::MCCDAQ(int Gain, int lowChan, int highChan, long Count, long Rate) {
 	this->m_linearCalibration.assign(8, std:: vector<float>(2));
 
 	for (size_t i = 0; i < this->m_linearCalibration.size(); i++) {
-		this->m_linearCalibration[i][0] = 50;
-		this->m_linearCalibration[i][1] = 500;
+		this->m_linearCalibration[i][0] = 50; // Sample slope
+		this->m_linearCalibration[i][1] = 500; // Sample y-intercept
 	}
 }
 
@@ -52,139 +52,110 @@ void MCCDAQ::set_daq_ports() {
 	this->m_MemHandle = cbWinBufAlloc(this->m_Count);
 	this->m_ADData = (WORD*)this->m_MemHandle;
 }
+
 void MCCDAQ::set_daq_units() {
 	std::string response;
+	int channel = this->m_lowChan;
 	bool unitSet = false;
 
-	std::cout << "\nTo set all the channels to the same unit, enter one of the units below. To set each channel individually, enter y." << std::endl;
-	std::cout << "P for Pressure (Psi)" << std::endl;
-	std::cout << "C for Temperature (Celsius)" << std::endl;
-	std::cout << "N for Force (Newtons)" << std::endl;
-	std::cout << "L/s for Flow Rate (Litres/second)" << std::endl;
-	std::cout << "Chosen unit: ";
+	std::cout << "Enter a unit for each channel (ex. P)." << std::endl;
 
 	do {
+		std::cout << "Channel " << channel << ": ";
 		std::cin >> response;
-
-		if (response == "P") {
-			fill(this->m_channelUnits.begin(), this->m_channelUnits.end(), "P");
-			std::cout << "Channels " << this->m_lowChan << " to " << this->m_highChan << " set to Pressure." << std::endl;
-			return;
-		}
-		else if (response == "C") {
-			fill(this->m_channelUnits.begin(), this->m_channelUnits.end(), "C");
-			std::cout << "Channels " << this->m_lowChan << " to " << this->m_highChan << " set to Temperature." << std::endl;
-			return;
-		}
-		else if (response == "N") {
-			fill(this->m_channelUnits.begin(), this->m_channelUnits.end(), "N");
-			std::cout << "Channels " << this->m_lowChan << " to " << this->m_highChan << " set to Force." << std::endl;
-			return;
-		}
-		else if (response == "L/s") {
-			fill(this->m_channelUnits.begin(), this->m_channelUnits.end(), "L/s");
-			std::cout << "Channels " << this->m_lowChan << " to " << this->m_highChan << " set to Flow Rate." << std::endl;
-			return;
-		}
-		else if (response == "y") {
-			std::cout << std::endl << "Setting each channel individually..." << std::endl;
-			std::cout << "For each channel, enter:" << std::endl;
-			std::cout << "P for Pressure (Psi)" << std::endl;
-			std::cout << "C for Temperature (Celsius)" << std::endl;
-			std::cout << "N for Force (Newtons)" << std::endl;
-			std::cout << "L/s for Flow Rate (Litres/second)" << std::endl;
-
-			int channel = this->m_lowChan;
-			do {
-				std::cout << "Channel " << channel << ": ";
-				std::cin >> response;
-				if (response == "P" || response == "C" || response == "N" || response == "L/s") {
-					this->m_channelUnits.at(channel) = response;
-					channel++;
-				}
-				else {
-					std::cout << "Enter P, C, N, or L/s." << std::endl;
-				}
-			} while (channel <= this->m_highChan);
-			return;
-		}
-		else {
-			std::cout << "Enter P, C, N, L/s, or y: ";
-		}
-	} while (response != "P" && response != "C" && response != "N" && response != "L/s" && response != "y");
+		this->m_channelUnits.at(channel) = response;
+		channel++;
+	} while (channel <= this->m_highChan);
 }
+
 void MCCDAQ::calibrate_daq() {
 	std::string response;
-	float calibratedVoltage;
-	float calibratedUnit;
-	bool validChannel = false;
-	bool validUnit = false;
+	std::string numOfPointsResponse;
+	std::string pointResponse;
+	int numOfPoints;
+	float numerator = 0;
+	float denominator = 0;
+	float xMean;
+	float yMean;
 	bool calibrated = false;
+	bool validNumOfPoints = false;
+	bool validXPoint = false;
+	bool validYPoint = false;
+
+	std::vector<float> x_voltages;
+	std::vector<float> y_units;
 
 	int channelNum = this->m_lowChan;
-	std::cout << "An inputted unit will be calibrated with an inputted voltage (ex. 14.696 P at -10 V)." << std::endl;
-
+	std::cout << "A set of inputted voltages (x-values) will be calibrated with a set of inputted units (y-values) (ex. -10 V and 14.696 P)." << std::endl;
 	do {
 		do {
-			try {
-				std::cout << "Calibrating channel " << channelNum << "..." << std::endl;
-				if (this->m_channelUnits.at(channelNum) == "P") {
-					std::cout << "Enter a value for pressure: ";
+			do {
+				try {
+					std::cout << "Calibrating channel " << channelNum << "..." << std::endl;
+					std::cout << "Enter the number of data points that will be used to calibrate this port: ";
+					std::cin >> numOfPointsResponse;
+					numOfPoints = stoi(numOfPointsResponse);
+					if (numOfPoints < 1) {
+						std::cout << "Number of data points cannot be 0." << std::endl;
+					}
+					else {
+						validNumOfPoints = true;
+					}
 				}
-				if (this->m_channelUnits.at(channelNum) == "C") {
-					std::cout << "Enter a value for temperature: ";
+				catch (std::invalid_argument e) {
+					std::cout << "Invalid input." << std::endl;
 				}
-				if (this->m_channelUnits.at(channelNum) == "N") {
-					std::cout << "Enter a value for force: ";
-				}
-				if (this->m_channelUnits.at(channelNum) == "L/s") {
-					std::cout << "Enter a value for flow rate: ";
-				}
-				std::cin >> response;
-				calibratedUnit = stof(response);
-				validUnit = true;
+			} while (!validNumOfPoints);
+
+			for (int currentPoint = 1; currentPoint <= numOfPoints; currentPoint++) {
+				do {
+					try {
+						std::cout << std::endl << "Enter voltage value (x-value) for point " << currentPoint << ": ";
+						std::cin >> pointResponse;
+						x_voltages.push_back(stof(pointResponse));
+						validXPoint = true;
+					}
+					catch (std::invalid_argument e) {
+						std::cout << "Invalid input." << std::endl;
+					}
+				} while (!validXPoint);
+				do {
+					try {
+						std::cout << "Enter unit (" << this->m_channelUnits.at(channelNum) <<") value (y-value) for point " << currentPoint << ": ";
+						std::cin >> pointResponse;
+						y_units.push_back(stof(pointResponse));
+						validYPoint = true;
+					}
+					catch (std::invalid_argument e) {
+						std::cout << "Invalid input." << std::endl;
+					}
+				} while (!validYPoint);
+				validXPoint = false;
+				validYPoint = false;
 			}
-			catch (std::invalid_argument e) {
-				std::cout << "Invalid input." << std::endl;
+
+			xMean = std::accumulate(x_voltages.begin(), x_voltages.end(), (float)0.0) / x_voltages.size();
+			yMean = std::accumulate(y_units.begin(), y_units.end(), (float)0.0) / y_units.size();
+			for (int i = 0; i < numOfPoints; i++) {
+				numerator += (x_voltages.at(i) - xMean)*(y_units.at(i) - yMean);
+				denominator += pow((x_voltages.at(i) - xMean), 2);
 			}
-		} while (!validUnit);
-
-		std::string unitType;
-
-		do {
-			try {
-				std::cout << "Enter the corresponding voltage value: ";
-				std::cin >> response;
-				calibratedVoltage = stof(response);
-
-				if (this->m_channelUnits.at(channelNum) == "P") {
-					unitType = "P";
-				}
-				else if (this->m_channelUnits.at(channelNum) == "C") {
-					unitType = "C";
-				}
-
-				else if (this->m_channelUnits.at(channelNum) == "N") {
-					unitType = "N";
-				}
-
-				else if (this->m_channelUnits.at(channelNum) == "L/s") {
-					unitType = "L/s";
-				}
-
-				this->m_linearCalibration.at(channelNum).at(0) = (1000 - calibratedUnit) / (10 - calibratedVoltage);
-				this->m_linearCalibration.at(channelNum).at(1) = 1000 - (this->m_linearCalibration.at(channelNum).at(0) * 10);
-
-				std::cout << "Channel " << channelNum << " calibrated with " << calibratedUnit << " " << unitType << " and " << calibratedVoltage << " V." << std::endl << std::endl;
+			if (denominator == 0) {
+				std::cout << "Error computing slope - vertical line. Double check points and try again." << std::endl;
+				calibrated = false;
+			}
+			else {
+				this->m_linearCalibration.at(channelNum).at(0) = numerator / denominator;
+				this->m_linearCalibration.at(channelNum).at(1) = yMean - (numerator / denominator)*xMean;
+				std::cout << "Channel " << channelNum << " calibrated with slope of " << this->m_linearCalibration.at(channelNum).at(0) << " and y-intercept of " << m_linearCalibration.at(channelNum).at(1) << "." << std::endl << std::endl;
 				calibrated = true;
-			}
-			catch (std::invalid_argument e) {
-				std::cout << "Invalid input." << std::endl;
 			}
 		} while (!calibrated);
 		channelNum++;
+		calibrated = false;
 	} while (channelNum <= this->m_highChan);
 }
+
 int MCCDAQ::get_board_status_single_port() {
 	this->m_BoardStatus = cbVIn(BOARD_NUM, this->m_lowChan, this->m_Gain, &this->m_Data, 0);
 	return this->m_BoardStatus;
@@ -196,14 +167,19 @@ int MCCDAQ::get_board_status_multiple_ports() {
 
 void MCCDAQ::print_data(std::vector<std::string> fileNames) {
 	if (get_board_status_multiple_ports() == 0) {
+		int portNum = this->m_lowChan;
 		printf("MCC: \n");
 		for (int i = 0; (i < this->m_Count); i++)
 		{
 			cbToEngUnits(BOARD_NUM, this->m_Gain, this->m_ADData[i], &this->m_EngUnits);
-			this->m_finalUnit = this->m_linearCalibration[i / 6 + this->m_lowChan][0] * this->m_EngUnits + this->m_linearCalibration[i / 6 + this->m_lowChan][1]; // -10V to +10V range
+			if (portNum > this->m_highChan) {
+				portNum = this->m_lowChan;
+			}
+			this->m_finalUnit = this->m_linearCalibration[portNum][0] * this->m_EngUnits + this->m_linearCalibration[portNum][1]; // -10V to +10V range
 
-			std::cout << "Port " << i / 6 + this->m_lowChan << ": " << fileNames.back() << " ms, " << this->m_ADData[i] << ", " << this->m_EngUnits << "V, " << this->m_finalUnit << this->m_channelUnits.at(i / 6 + this->m_lowChan) << std::endl;
+			std::cout << "Port " << portNum << ": " << fileNames.back() << " ms, " << this->m_ADData[i] << ", " << this->m_EngUnits << "V, " << this->m_finalUnit << this->m_channelUnits.at(portNum) << std::endl;
 			this->m_DAQData.push_back(this->m_finalUnit);
+			portNum++;
 		}
 	}
 	else {
