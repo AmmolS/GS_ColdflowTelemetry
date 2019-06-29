@@ -191,7 +191,38 @@ void write_to_JSON(vector<string> time, vector<double> T1, vector<double> T2, ve
 	ofs.close();
 }
 
-void write_to_csv(vector<string> time, vector<double> T1, vector<double> T2, vector<double> DAQData, vector<string> channelUnits, int lowChan, int highChan) {
+void write_csv_heading(int lowChan, int highChan, vector<string> channelUnits) {
+	std::ofstream ofs("Output/CSV/DAQData.csv",  std::ofstream::trunc);
+
+	ofs << "DAQ" << std::endl << ",";
+	for (int i = lowChan; i <= highChan; i++) {
+		ofs << ",Port " << i << " (" << channelUnits.at(i) << ")";
+	}
+	ofs << std::endl;
+	ofs.close();
+}
+void write_to_csv(vector<string> time, vector<double> T1, vector<double> T2, vector<double> DAQVoltages, vector<double> DAQData, vector<string> channelUnits, int lowChan, int highChan) {
+	std::ofstream ofs("Output/CSV/DAQData.csv", std::ofstream::app);
+	int numOfPorts = highChan - lowChan + 1;
+	int dataCount = 0;
+	int voltageCount = 0;
+	ofs << time.back() << "ms";
+	for (int i = 1; i <= 6; i++) {
+		ofs << ",Voltage (V) " << i;
+		for (; voltageCount < numOfPorts*i; voltageCount++) {
+			ofs << "," << DAQVoltages.at(voltageCount);
+		}
+		ofs << endl;
+		ofs << ",Data " << i;
+		for (; dataCount < numOfPorts*i; dataCount++) {
+			ofs << "," << DAQData.at(dataCount);
+		}
+		ofs << endl;
+	}
+}
+
+/*
+void write_to_csv2(vector<string> time, vector<double> T1, vector<double> T2, vector<double> DAQData, vector<string> channelUnits, int lowChan, int highChan) {
 	int numOfPorts = highChan - lowChan + 1;
 
 	std::ofstream ofs("Output/CSV/" + time.back() + "ms.csv", std::ofstream::app);
@@ -238,6 +269,7 @@ void write_to_csv(vector<string> time, vector<double> T1, vector<double> T2, vec
 	ofs.close();
 
 }
+*/
 
 string set_arduino_port_num() {
 	string response;
@@ -315,13 +347,17 @@ int main()
 		BoardStatus = daq.get_board_status_multiple_ports();
 
 		daq.set_daq_units();
+		write_csv_heading(daq.get_low_chan(), daq.get_high_chan(), daq.get_channel_units());
 
-		cout << "\nCalibrate DAQ voltage (y for yes)? (By default, -10 V is 0 units): ";
 		string response;
-		cin >> response;
-		if (response == "y") {
-			daq.calibrate_daq();
-		}
+		do {
+			cout << endl << "Enter y to calibrate DAQ, or enter n to use default calibration (by default, -10 V is 0 units): ";
+			cin >> response;
+			if (response == "y") {
+				daq.calibrate_daq();
+			}
+		} while (response != "y" && response != "n");
+		
 	}
 
 	if (arduino.isConnected() || BoardStatus == 0) {
@@ -332,7 +368,6 @@ int main()
 
 	clock_t time = clock();
 	while (!(GetAsyncKeyState(VK_ESCAPE) & 1) && (arduino.isConnected() || BoardStatus == 0)) {
-		cout << "Press the ESC key to end data collection." << endl;
 
 		if (arduino.isConnected()) {
 			//Check if data has been read or not
@@ -387,18 +422,18 @@ int main()
 
 		fileNames.push_back(to_string(clock() - time));
 
-		daq.print_data(fileNames);
+		daq.collect_data(fileNames);
 
 		if (arduino.isConnected()) {
 			printf("\nArduino: \n");
 			printf("%s", incomingData);
 		}
 
-		
 		write_to_JSON(fileNames, T1, T2, daq.get_daq_data(), daq.get_channel_units(), daq.get_low_chan(), daq.get_high_chan());
-		write_to_csv(fileNames, T1, T2, daq.get_daq_data(), daq.get_channel_units(), daq.get_low_chan(), daq.get_high_chan());
+		write_to_csv(fileNames, T1, T2, daq.get_daq_voltages(),daq.get_daq_data(), daq.get_channel_units(), daq.get_low_chan(), daq.get_high_chan());
 		update_filename(fileNames);
 
+		daq.clear_daq_voltages();
 		daq.clear_daq_data();
 		T1.clear();
 		T2.clear();
@@ -415,8 +450,8 @@ int main()
 				// Remove files in Output folder
 				for (size_t i = 0; i < fileNames.size(); ++i) {
 					remove(("Output/JSON/" + fileNames.at(i) + "ms.json").c_str());
-					remove(("Output/CSV/" + fileNames.at(i) + "ms.csv").c_str());
 				}
+				remove("Output/CSV/DAQData.csv");
 			}
 			else if (response == "y") {
 				cout << endl << "Files saved in:" << endl;
