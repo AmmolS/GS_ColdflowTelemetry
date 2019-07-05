@@ -302,8 +302,9 @@ void MCCDAQ::collect_data(std::vector<std::string> fileNames) {
 	}
 	else {
 		for (int i = 0; i < this->m_Count; i++) {
-			this->m_DAQVoltages.push_back(-1000);
+			this->m_DAQVoltages.push_back(-999);
 			this->m_DAQData.push_back(-999);
+			std::cout << "Error with DAQ - Code " << get_board_status_multiple_ports() << std::endl;
 		}
 	}
 }

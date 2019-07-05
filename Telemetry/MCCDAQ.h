@@ -31,6 +31,8 @@ private:
 	std::vector<double> m_DAQData;
 
 	bool linear_regression(int numOfPoints,std::vector<float> x_voltages, std::vector<float> y_units, float *slope, float *y_intercept);
+	void calibrate_daq_manually();
+	void calibrate_daq_automatically();
 
 public:
 	MCCDAQ(int Gain, int lowChan, int highChan, long Count, long Rate);
@@ -38,8 +40,6 @@ public:
 	void set_daq_ports();
 	void set_daq_units();
 	void calibrate_daq();
-	void calibrate_daq_manually();
-	void calibrate_daq_automatically();
 
 	int get_board_status_single_port();
 	int get_board_status_multiple_ports();
