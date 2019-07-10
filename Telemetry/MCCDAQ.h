@@ -5,6 +5,7 @@
 #include <iostream>
 #include <numeric>
 #include <math.h>
+#include <fstream>
 
 #define BOARD_NUM 0
 
@@ -44,6 +45,8 @@ public:
 	int get_board_status_single_port();
 	int get_board_status_multiple_ports();
 	void collect_data(std::vector<std::string>);
+	void write_csv_heading_daq();
+	void write_to_csv_daq(std::vector<std::string> filenames);
 
 	std::vector<double> get_daq_voltages();
 	std::vector<double> get_daq_data();

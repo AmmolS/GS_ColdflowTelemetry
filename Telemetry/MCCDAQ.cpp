@@ -299,6 +299,7 @@ void MCCDAQ::collect_data(std::vector<std::string> fileNames) {
 			this->m_DAQData.push_back(this->m_finalUnit);
 			portNum++;
 		}
+		write_to_csv_daq(fileNames);
 	}
 	else {
 		for (int i = 0; i < this->m_Count; i++) {
@@ -306,6 +307,37 @@ void MCCDAQ::collect_data(std::vector<std::string> fileNames) {
 			this->m_DAQData.push_back(-999);
 			std::cout << "Error with DAQ - Code " << get_board_status_multiple_ports() << std::endl;
 		}
+	}
+}
+
+void MCCDAQ::write_csv_heading_daq() {
+	std::ofstream ofs("Output/CSV/DAQData.csv", std::ofstream::trunc);
+
+	ofs << "DAQ" << std::endl << ",";
+	for (int i = this->m_lowChan; i <= this->m_highChan; i++) {
+		ofs << ",Port " << i << " (" << this->m_channelUnits.at(i) << ")";
+	}
+	ofs << std::endl;
+	ofs.close();
+}
+
+void MCCDAQ::write_to_csv_daq(std::vector<std::string> filenames) {
+	std::ofstream ofs("Output/CSV/DAQData.csv", std::ofstream::app);
+	int numOfPorts = this->m_highChan - this->m_lowChan + 1;
+	int dataCount = 0;
+	int voltageCount = 0;
+	ofs << filenames.back() << "ms";
+	for (int i = 1; i <= 6; i++) {
+		ofs << ",Voltage (V) " << i;
+		for (; voltageCount < numOfPorts*i; voltageCount++) {
+			ofs << "," << this->m_DAQVoltages.at(voltageCount);
+		}
+		ofs << std::endl;
+		ofs << ",Data " << i;
+		for (; dataCount < numOfPorts*i; dataCount++) {
+			ofs << "," << this->m_DAQData.at(dataCount);
+		}
+		ofs << std::endl;
 	}
 }
 

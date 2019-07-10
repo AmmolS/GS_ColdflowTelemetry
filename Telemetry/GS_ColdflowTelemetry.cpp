@@ -15,19 +15,20 @@
 #include <string>
 #include <algorithm>
 #include <conio.h>
-#include <fstream>
 #include <iomanip>
 #include <ctime>
 #include <cstdio>
 #include <chrono>
 #include <thread>
-#include <windows.h>
+//#include <windows.h>
 #include <time.h>
 #include <vector>
 #include <fileapi.h>
 #include <filesystem>
 
 using namespace std;
+
+char incomingData[MAX_DATA_LENGTH];
 
 void update_filename(vector<string> fileNames) {
 	// Create new JSON file (or truncate existing contents)
@@ -193,36 +194,6 @@ void write_to_JSON(vector<string> time, vector<double> T1, vector<double> T2, ve
 	ofs.close();
 }
 
-void write_daq_csv_heading(int lowChan, int highChan, vector<string> channelUnits) {
-	std::ofstream ofs("Output/CSV/DAQData.csv",  std::ofstream::trunc);
-
-	ofs << "DAQ" << std::endl << ",";
-	for (int i = lowChan; i <= highChan; i++) {
-		ofs << ",Port " << i << " (" << channelUnits.at(i) << ")";
-	}
-	ofs << std::endl;
-	ofs.close();
-}
-void write_to_daq_csv(vector<string> time, vector<double> DAQVoltages, vector<double> DAQData, vector<string> channelUnits, int lowChan, int highChan) {
-	std::ofstream ofs("Output/CSV/DAQData.csv", std::ofstream::app);
-	int numOfPorts = highChan - lowChan + 1;
-	int dataCount = 0;
-	int voltageCount = 0;
-	ofs << time.back() << "ms";
-	for (int i = 1; i <= 6; i++) {
-		ofs << ",Voltage (V) " << i;
-		for (; voltageCount < numOfPorts*i; voltageCount++) {
-			ofs << "," << DAQVoltages.at(voltageCount);
-		}
-		ofs << endl;
-		ofs << ",Data " << i;
-		for (; dataCount < numOfPorts*i; dataCount++) {
-			ofs << "," << DAQData.at(dataCount);
-		}
-		ofs << endl;
-	}
-}
-
 void write_arduino_csv_heading() {
 	std::ofstream ofs("Output/CSV/ArduinoData.csv", std::ofstream::trunc);
 
@@ -315,112 +286,17 @@ string set_arduino_port_num() {
 	return port_string;
 }
 
-void collect_data(SerialPort arduino, MCCDAQ daq, vector<string> *fileNames) {
-	short BoardStatus = daq.get_board_status_multiple_ports();
-
-	vector<double> T1;
-	vector<double> T2;
-
-	char incomingData[MAX_DATA_LENGTH];
-
-	if (arduino.isConnected() || BoardStatus == 0) {
-		cout << "Press the ESC key at any time to end data collection." << endl;
-		Sleep(1500);
-	}
-
-	clock_t time = clock();
-	while (!(GetAsyncKeyState(VK_ESCAPE) & 1) && (arduino.isConnected() || BoardStatus == 0)) {
-
-		if (arduino.isConnected()) {
-			//Check if data has been read or not
-			int read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH);
-
-			istringstream raw(incomingData);
-			string thermocouple;
-
-			// Temperature value of -999 is an error/invalid value
-			while (getline(raw, thermocouple, '-')) {
-				// Find all valid numbers in received string and push them to temperature vector
-				if (thermocouple.find("T1") != string::npos && thermocouple.length() > thermocouple.find("T1") + 7)
-				{
-					try {
-						T1.push_back(stod(thermocouple.substr(thermocouple.find("T1") + 3, 5)));
-					}
-					catch (invalid_argument e) {
-						T1.push_back(-999);
-					}
-
-				}
-				else
-				{
-					T1.push_back(-999);
-				}
-
-				if (thermocouple.find("T2") != string::npos && thermocouple.length() > thermocouple.find("T2") + 7)
-				{
-					try {
-						T2.push_back(stod(thermocouple.substr(thermocouple.find("T2") + 3, 5)));
-					}
-					catch (invalid_argument e) {
-						T2.push_back(-999);
-					}
-
-				}
-				else
-				{
-					T2.push_back(-999);
-				}
-			}
-		}
-
-		// Force vector to have size of 6
-		while (T1.size() <= 6) {
-			T1.push_back(-999);
-		}
-
-		while (T2.size() <= 6) {
-			T2.push_back(-999);
-		}
-
-		fileNames->push_back(to_string(clock() - time));
-
-		daq.collect_data(*fileNames);
-
-		if (arduino.isConnected()) {
-			printf("\nArduino: \n");
-			printf("%s", incomingData);
-			write_to_arduino_csv(*fileNames, T1, T2);
-		}
-
-		write_to_JSON(*fileNames, T1, T2, daq.get_daq_data(), daq.get_channel_units(), daq.get_low_chan(), daq.get_high_chan());
-		write_to_daq_csv(*fileNames, daq.get_daq_voltages(), daq.get_daq_data(), daq.get_channel_units(), daq.get_low_chan(), daq.get_high_chan());
-		
-		update_filename(*fileNames);
-
-		daq.clear_daq_voltages();
-		daq.clear_daq_data();
-		T1.clear();
-		T2.clear();
-
-		// Wait 0.1 seconds (time between each file write operation)
-		Sleep(100);
-	}
-}
-
-bool check_arduino(SerialPort arduino) {
-	if (!arduino.isConnected()) {
+void printArduinoStatus(bool isConnected) {
+	if (!isConnected) {
 		cout << "Arduino is not connected." << endl;
-		return false;
 	}
 	else {
 		cout << "Connection established with Arduino." << endl;
-		write_arduino_csv_heading();
-		return true;
 		//Sleep(3000); // Give time to initialize Arduino
 	}
 }
 
-void save_data(SerialPort arduino, MCCDAQ daq, vector<string> fileNames) {
+void save_data(vector<string> fileNames) {
 	string response;
 	string source;
 	string destination;
@@ -429,7 +305,7 @@ void save_data(SerialPort arduino, MCCDAQ daq, vector<string> fileNames) {
 	bool newDirectoryAvailable = true;
 
 	do {
-		cout << "Save collected data? Enter y or n: ";
+		cout << endl << "Save collected data? Enter y or n: ";
 		cin >> response;
 		if (response == "n") {
 			// Remove files in Output folder
@@ -437,6 +313,7 @@ void save_data(SerialPort arduino, MCCDAQ daq, vector<string> fileNames) {
 				remove(("Output/JSON/" + fileNames.at(i) + "ms.json").c_str());
 			}
 			remove("Output/CSV/DAQData.csv");
+			remove("Output/CSV/ArduinoData.csv");
 			std::ofstream jsFile("Output/JSON/JSFileName/FileList.json", std::ofstream::trunc);
 			jsFile.close();
 			cout << "Files removed." << endl;
@@ -445,7 +322,7 @@ void save_data(SerialPort arduino, MCCDAQ daq, vector<string> fileNames) {
 			DWORD ftyp;
 
 			do {
-				cout << "Enter a the path of the folder where the data should be saved:" << endl;
+				cout << "Enter the path of the folder where the data should be saved:" << endl;
 				cin >> destination;
 				ftyp = GetFileAttributesA(destination.c_str());
 				if (ftyp == INVALID_FILE_ATTRIBUTES) {
@@ -468,15 +345,14 @@ void save_data(SerialPort arduino, MCCDAQ daq, vector<string> fileNames) {
 				remove(("Output/JSON/" + fileNames.at(i) + "ms.json").c_str());
 			}
 			remove("Output/CSV/DAQData.csv");
+			remove("Output/CSV/ArduinoData.csv");
 			std::ofstream jsFile("Output/JSON/JSFileName/FileList.json", std::ofstream::trunc);
 			jsFile.close();
 		}
 	} while (response != "y" && response != "n");
 }
 
-int check_daq(MCCDAQ daq) {
-	int BoardStatus = daq.get_board_status_single_port();
-
+int printDAQStatus(int BoardStatus) {
 	if (BoardStatus == 343) {
 		cout << endl << "MCC DAQ is not connected (Code " << BoardStatus << ")." << endl;
 		cout << "Press any key to continue." << endl;
@@ -498,43 +374,37 @@ int check_daq(MCCDAQ daq) {
 	}
 }
 
+
 int main() {
 	// Set up DAQ
 	MCCDAQ daq(BIP10VOLTS, 0, 0, 6, 100000);
 
-	vector<double> T1;
-	vector<double> T2;
 	vector<string> fileNames;
 
 	bool setDAQPorts = true;
 	bool setDAQUnits = true;
 	bool calibrateDAQ = true;
 
-	int daqBoardStatus;
-	bool arduinoConnected;
-
 	// Arduino portname
 	string port_string = set_arduino_port_num();
 	const char *port_name = port_string.c_str();
 
-
 	SerialPort arduino(port_name);
 
 	string response;
-		
 	do {
-		arduinoConnected =  check_arduino(arduino);
-		daqBoardStatus = check_daq(daq);
-		if (daqBoardStatus == 0 && setDAQPorts) {
+		//arduinoConnected =  check_arduino(arduino);
+		printArduinoStatus(arduino.isConnected());
+		printDAQStatus(daq.get_board_status_multiple_ports());
+		if (daq.get_board_status_multiple_ports() == 0 && setDAQPorts) {
 			daq.set_daq_ports();
 			setDAQPorts = false;
 		}
-		if (daqBoardStatus == 0 && setDAQUnits) {
+		if (daq.get_board_status_multiple_ports() == 0 && setDAQUnits) {
 			daq.set_daq_units();
-			write_daq_csv_heading(daq.get_low_chan(), daq.get_high_chan(), daq.get_channel_units());
 			setDAQUnits = false;
 		}
-		if (daqBoardStatus == 0 && calibrateDAQ) {
+		if (daq.get_board_status_multiple_ports() == 0 && calibrateDAQ) {
 			string response;
 			do {
 				cout << endl << "Enter y to calibrate DAQ, or enter n to use default calibration (by default, -10 V is 0 units and 0 V is 500 units): ";
@@ -545,9 +415,105 @@ int main() {
 			} while (response != "y" && response != "n");
 			calibrateDAQ = false;
 		}
-		if (arduinoConnected || daqBoardStatus == 0) {
-			collect_data(arduino, daq, &fileNames);
-			save_data(arduino, daq, fileNames);
+		daq.write_csv_heading_daq();
+
+		if (arduino.isConnected() || daq.get_board_status_multiple_ports() == 0) {
+			write_arduino_csv_heading();
+			cout << "Press the ESC key at any time to end data collection." << endl;
+			Sleep(1500);
+			clock_t time = clock();
+			while (!(GetAsyncKeyState(VK_ESCAPE) & 1) && (arduino.isConnected() || daq.get_board_status_multiple_ports() == 0)) {
+				//collect_data(arduino, daq, &fileNames, time);
+
+				vector<double> T1;
+				vector<double> T2;
+
+				if (arduino.isConnected()) {
+					//Check if data has been read or not
+					int read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH);
+					printf("%s", incomingData);
+
+					//printf("\nArduino: \n");
+					//puts(incomingData);
+
+					istringstream raw(incomingData);
+					string thermocouple;
+
+					// Temperature value of -999 is an error/invalid value
+					while (getline(raw, thermocouple, ';')) {
+						// Find all valid numbers in received string and push them to temperature vector
+						//Testcout << "TESTTTTTTTT" << endl;
+						if (thermocouple.find("T1") != string::npos)
+						{
+							try {
+								T1.push_back(stod(thermocouple.substr(thermocouple.find("T1") + 3, thermocouple.find(",") - (thermocouple.find("T1") + 3))));
+							}
+							catch (invalid_argument e) {
+								T1.push_back(-999);
+								//cout << "Test1-1" << endl;
+							}
+							catch (out_of_range e) {
+								T2.push_back(-999);
+							}
+
+						}
+						else
+						{
+							T1.push_back(-999);
+						}
+
+						if (thermocouple.find("T2") != string::npos)
+						{
+							try {
+								T2.push_back(stod(thermocouple.substr(thermocouple.find("T2") + 3, thermocouple.length() - (thermocouple.find("T2") + 3))));
+							}
+							catch (invalid_argument e) {
+								T2.push_back(-999);
+							}
+							catch (out_of_range e) {
+								T2.push_back(-999);
+							}
+
+						}
+						else
+						{
+							T2.push_back(-999);
+						}
+					}
+				}
+
+				// Force vector to have size of 6
+				while (T1.size() <= 6) {
+					T1.push_back(-999);
+					//cout << "Test1-2" << endl;
+				}
+
+				while (T2.size() <= 6) {
+					T2.push_back(-999);
+					//cout << "Test2-2" << endl;
+				}
+
+				fileNames.push_back(to_string(clock() - time));
+
+				if (daq.get_board_status_multiple_ports() == 0) {
+					daq.collect_data(fileNames);
+				}
+
+				if (arduino.isConnected()) {
+					write_to_arduino_csv(fileNames, T1, T2);
+				}
+
+				write_to_JSON(fileNames, T1, T2, daq.get_daq_data(), daq.get_channel_units(), daq.get_low_chan(), daq.get_high_chan());
+
+				update_filename(fileNames);
+				T1.clear();
+				T2.clear();
+
+				// Wait 0.1 seconds (time between each file write operation)
+				Sleep(100);
+			}
+
+			save_data(fileNames);
 
 			cout << std::endl << "Choose one of the following options:" << std::endl;
 			cout << "a. Perform another test using the same settings." << std::endl;
@@ -559,14 +525,12 @@ int main() {
 				cin >> response;
 			} while (response != "a" && response != "b" && response != "c");
 
-			daqBoardStatus = daq.get_board_status_multiple_ports();
-
-			if (daqBoardStatus == 0 && response == "a") {
+			if (daq.get_board_status_multiple_ports() == 0 && response == "a") {
 				setDAQPorts = false;
 				setDAQUnits = false;
 				calibrateDAQ = false;
 			}
-			else if (daqBoardStatus == 0 && response == "b") {
+			else if (daq.get_board_status_multiple_ports() == 0 && response == "b") {
 				string changePortsResponse;
 				do {
 					cout << "Change which ports the DAQ will be using? Enter y or n: ";
@@ -599,7 +563,10 @@ int main() {
 				}
 			}
 		}
-	} while ((arduinoConnected || daqBoardStatus == 0) && response != "c");
+	} while ((arduino.isConnected() || daq.get_board_status_multiple_ports() == 0) && response != "c");
+
+	printArduinoStatus(arduino.isConnected());
+	printDAQStatus(daq.get_board_status_multiple_ports());
 
 	return 0;
 }
