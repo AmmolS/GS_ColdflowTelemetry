@@ -313,9 +313,9 @@ void MCCDAQ::collect_data(std::vector<std::string> fileNames) {
 void MCCDAQ::write_csv_heading_daq() {
 	std::ofstream ofs("Output/CSV/DAQData.csv", std::ofstream::trunc);
 
-	ofs << "DAQ" << std::endl << ",";
+	ofs << "DAQ" << std::endl;
 	for (int i = this->m_lowChan; i <= this->m_highChan; i++) {
-		ofs << ",Port " << i << " (" << this->m_channelUnits.at(i) << ")";
+		ofs << ",Port " << i << " (V)" << ",Port " << i << " (" << this->m_channelUnits.at(i) << ")";
 	}
 	ofs << std::endl;
 	ofs.close();
@@ -327,6 +327,14 @@ void MCCDAQ::write_to_csv_daq(std::vector<std::string> filenames) {
 	int dataCount = 0;
 	int voltageCount = 0;
 	ofs << filenames.back() << "ms";
+	for (int i = 0; i < this->m_Count; i++) {
+		if (i != 0 && i % numOfPorts == 0) {
+			ofs << std::endl;
+		}
+		ofs << "," << this->m_DAQVoltages.at(i) << "," << this->m_DAQData.at(i);
+	}
+	ofs << std::endl;
+	/*
 	for (int i = 1; i <= 6; i++) {
 		ofs << ",Voltage (V) " << i;
 		for (; voltageCount < numOfPorts*i; voltageCount++) {
@@ -339,6 +347,7 @@ void MCCDAQ::write_to_csv_daq(std::vector<std::string> filenames) {
 		}
 		ofs << std::endl;
 	}
+	*/
 }
 
 std::vector<double> MCCDAQ::get_daq_voltages() {

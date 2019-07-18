@@ -508,6 +508,8 @@ int main() {
 				update_filename(fileNames);
 				T1.clear();
 				T2.clear();
+				daq.clear_daq_voltages();
+				daq.clear_daq_data();
 
 				// Wait 0.1 seconds (time between each file write operation)
 				Sleep(100);
