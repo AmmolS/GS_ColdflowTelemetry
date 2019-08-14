@@ -1,29 +1,550 @@
-<UI version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>GS_ColdflowTelemetryGUIClass</class>
- <widget class="QMainWindow" name="GS_ColdflowTelemetryGUIClass" >
-  <property name="objectName" >
-   <string notr="true">GS_ColdflowTelemetryGUIClass</string>
+ <widget class="QMainWindow" name="GS_ColdflowTelemetryGUIClass">
+  <property name="enabled">
+   <bool>true</bool>
   </property>
-  <property name="geometry" >
+  <property name="geometry">
    <rect>
-	<x>0</x>
-	<y>0</y>
-	<width>600</width>
-	<height>400</height>
+    <x>0</x>
+    <y>0</y>
+    <width>503</width>
+    <height>273</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>GS_ColdflowTelemetryGUI</string>
   </property>
-  <widget class="QMenuBar" name="menuBar" />
-  <widget class="QToolBar" name="mainToolBar" />
-  <widget class="QWidget" name="centralWidget" />
-  <widget class="QStatusBar" name="statusBar" />
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QHBoxLayout" name="horizontalLayout_10">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QGroupBox" name="DAQStatusBox">
+        <property name="title">
+         <string>DAQ Status</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <widget class="QLabel" name="currentStateLabel">
+             <property name="text">
+              <string>Current state:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="currentStateLabelDynamic">
+             <property name="text">
+              <string>DAQ disconnected</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_7">
+           <item>
+            <widget class="QLabel" name="channelsSetLabel">
+             <property name="text">
+              <string>Channels set:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="channelsSetLabelDynamic">
+             <property name="text">
+              <string>False</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_8">
+           <item>
+            <widget class="QLabel" name="unitsSetLabel">
+             <property name="text">
+              <string>Units set: </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="unitsSetLabelDynamic">
+             <property name="text">
+              <string>False</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_17">
+           <item>
+            <widget class="QLabel" name="calibrationDoneLabel">
+             <property name="text">
+              <string>Calibrated: </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="calibrationDoneLabelDynamic">
+             <property name="text">
+              <string>False</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_9">
+           <item>
+            <widget class="QLabel" name="collectingDataLabel">
+             <property name="text">
+              <string>Collecting data:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="collectingDataLabelDynamic">
+             <property name="text">
+              <string>False</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="frame">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QLabel" name="boardNumLabel">
+             <property name="text">
+              <string>Board Number</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="boardNumInput">
+             <property name="inputMask">
+              <string>9</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="validateDAQButton">
+             <property name="text">
+              <string>Validate DAQ</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QLabel" name="lowerChannelLabel">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Lower Channel</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lowerChannelInput">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QLabel" name="higherChannelLabel">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Higher Channel</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="higherChannelInput">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QLabel" name="channelsStatusLabelDynamic">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Enter a range of channels above</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="confirmChannelsButton">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Confirm Channels</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QFrame" name="channelUnitsFrame">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item row="0" column="0">
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="7" column="3">
+          <widget class="QPushButton" name="channel6CalibrateButton">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Not Calibrated</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="3">
+          <widget class="QPushButton" name="channel5CalibrateButton">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Not Calibrated</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="channel6Label">
+           <property name="text">
+            <string>Channel 6</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLineEdit" name="channel3UnitInput"/>
+         </item>
+         <item row="3" column="3">
+          <widget class="QPushButton" name="channel2CalibrateButton">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Not Calibrated</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="3">
+          <widget class="QPushButton" name="channel0CalibrateButton">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Not Calibrated</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="channelUnitLabel">
+           <property name="text">
+            <string>Entered unit</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLineEdit" name="channel2UnitInput"/>
+         </item>
+         <item row="6" column="1">
+          <widget class="QLineEdit" name="channel5UnitInput"/>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLineEdit" name="channel4UnitInput"/>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="channel5Label">
+           <property name="text">
+            <string>Channel 5</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="channel7Label">
+           <property name="text">
+            <string>Channel 7</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QLineEdit" name="channel6UnitInput"/>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="channel0Label">
+           <property name="text">
+            <string>Channel 0</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="1">
+          <widget class="QLineEdit" name="channel7UnitInput"/>
+         </item>
+         <item row="4" column="3">
+          <widget class="QPushButton" name="channel3CalibrateButton">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Not Calibrated</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="channel0UnitInput"/>
+         </item>
+         <item row="5" column="3">
+          <widget class="QPushButton" name="channel4CalibrateButton">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Not Calibrated</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="channel3Label">
+           <property name="text">
+            <string>Channel 3</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="channel2Label">
+           <property name="text">
+            <string>Channel 2</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="channel1Label">
+           <property name="text">
+            <string>Channel 1</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="channel4Label">
+           <property name="text">
+            <string>Channel 4</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="3">
+          <widget class="QPushButton" name="channel7CalibrateButton">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Not Calibrated</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="channel1UnitInput"/>
+         </item>
+         <item row="2" column="3">
+          <widget class="QPushButton" name="channel1CalibrateButton">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Not Calibrated</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QLabel" name="channel0SelectedUnitLabelDynamic">
+           <property name="text">
+            <string>Not set</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLabel" name="channelSelectedUnitLabel">
+           <property name="text">
+            <string>Selected unit</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="2">
+          <widget class="QLabel" name="channel1SelectedUnitLabelDynamic">
+           <property name="text">
+            <string>Not set</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="2">
+          <widget class="QLabel" name="channel2SelectedUnitLabelDynamic">
+           <property name="text">
+            <string>Not set</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="2">
+          <widget class="QLabel" name="channel3SelectedUnitLabelDynamic">
+           <property name="text">
+            <string>Not set</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="2">
+          <widget class="QLabel" name="channel4SelectedUnitLabelDynamic">
+           <property name="text">
+            <string>Not set</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="2">
+          <widget class="QLabel" name="channel5SelectedUnitLabelDynamic">
+           <property name="text">
+            <string>Not set</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="2">
+          <widget class="QLabel" name="channel6SelectedUnitLabelDynamic">
+           <property name="text">
+            <string>Not set</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="2">
+          <widget class="QLabel" name="channel7SelectedUnitLabelDynamic">
+           <property name="text">
+            <string>Not set</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QLabel" name="channelsUnitLabelDynamic">
+           <property name="text">
+            <string>Enter the units that will be measured above</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="confirmUnitsButton">
+           <property name="text">
+            <string>Confirm Units</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>503</width>
+     <height>18</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
  </widget>
- <layoutDefault spacing="6" margin="11" />
- <pixmapfunction></pixmapfunction>
+ <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>validateDAQButton</tabstop>
+  <tabstop>lowerChannelInput</tabstop>
+  <tabstop>higherChannelInput</tabstop>
+ </tabstops>
  <resources>
-   <include location="GS_ColdflowTelemetryGUI.qrc"/>
+  <include location="GS_ColdflowTelemetryGUI.qrc"/>
  </resources>
  <connections/>
-</UI>
+</ui>

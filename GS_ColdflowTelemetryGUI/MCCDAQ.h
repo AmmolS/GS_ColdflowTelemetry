@@ -1,3 +1,6 @@
+#ifndef MCCDAQ_H
+#define MCCDAQ_H
+
 #include "cbw.h"
 
 #include <vector>
@@ -7,11 +10,11 @@
 #include <math.h>
 #include <fstream>
 
-#define BOARD_NUM 0
 
 class MCCDAQ 
 {
 private:
+	int m_BoardNum;
 	int m_Gain;
 	float m_Data;
 	float m_EngUnits;
@@ -36,10 +39,14 @@ private:
 	void calibrate_daq_automatically();
 
 public:
-	MCCDAQ(int Gain, int lowChan, int highChan, long Count, long Rate);
+	MCCDAQ();
+	MCCDAQ(int boardNum, int Gain, int lowChan, int highChan, long Count, long Rate);
 
-	void set_daq_ports();
-	void set_daq_units();
+	void set_board_num(int boardNum);
+	void set_low_chan(int lowChan);
+	void set_high_chan(int highChan);
+	void set_daq_channels(int lowChan, int highChan);
+	void set_daq_units(std::string unit, int index);
 	void calibrate_daq();
 
 	int get_board_status_single_port();
@@ -57,3 +64,4 @@ public:
 	void clear_daq_voltages();
 	void clear_daq_data();
 };
+#endif

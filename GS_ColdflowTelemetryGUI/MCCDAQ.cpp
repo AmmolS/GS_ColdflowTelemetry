@@ -1,6 +1,27 @@
 #include "MCCDAQ.h"
 
-MCCDAQ::MCCDAQ(int Gain, int lowChan, int highChan, long Count, long Rate) {
+MCCDAQ::MCCDAQ() {
+	this->m_BoardNum = 0;
+	this->m_Gain = BIP10VOLTS;
+	this->m_lowChan = 0;
+	this->m_highChan = 0;
+	this->m_Count = 6;
+	this->m_Rate = 100000;
+
+	this->m_MemHandle = cbWinBufAlloc(m_Count);
+	this->m_ADData = (WORD*)m_MemHandle;
+
+	this->m_channelUnits.assign(8, "");
+	this->m_linearCalibration.assign(8, std::vector<float>(2));
+
+	for (size_t i = 0; i < this->m_linearCalibration.size(); i++) {
+		this->m_linearCalibration[i][0] = 50; // Sample slope
+		this->m_linearCalibration[i][1] = 500; // Sample y-intercept
+	}
+}
+
+MCCDAQ::MCCDAQ(int boardNum, int Gain, int lowChan, int highChan, long Count, long Rate) {
+	this->m_BoardNum = boardNum;
 	this->m_Gain = Gain;
 	this->m_lowChan = lowChan;
 	this->m_highChan = highChan;
@@ -41,7 +62,30 @@ bool MCCDAQ::linear_regression(int numOfPoints, std::vector<float> x_voltages, s
 	}
 }
 
-void MCCDAQ::set_daq_ports() {
+void MCCDAQ::set_board_num(int boardNum)
+{
+	this->m_BoardNum = boardNum;
+}
+
+void MCCDAQ::set_low_chan(int lowChan) {
+	this->m_lowChan = lowChan;
+}
+
+void MCCDAQ::set_high_chan(int highChan) {
+	this->m_highChan = highChan;
+}
+
+void MCCDAQ::set_daq_channels(int lowChan, int highChan) {
+	this->m_lowChan = lowChan;
+	this->m_highChan = highChan;
+
+	// MCC sampling
+	this->m_Count = 6 * (this->m_highChan - this->m_lowChan + 1); // Total number of samples to be collected (6 samples * # of channels)
+	this->m_Rate = 100000 / (this->m_highChan - this->m_lowChan + 1); // Rate that samples are collected per channel
+	this->m_MemHandle = cbWinBufAlloc(this->m_Count);
+	this->m_ADData = (WORD*)this->m_MemHandle;
+
+	/*
 	bool validRange = false;
 	std::cout << std::endl << "Setting the lower and higher number of DAQ channels used (max. range of 7 channels)" << std::endl;
 	do {
@@ -67,16 +111,13 @@ void MCCDAQ::set_daq_ports() {
 			std::cout << "Invalid channel input." << std::endl;
 		}
 	} while (!validRange);
-
-	// MCC sampling
-	this->m_Count = 6 * (this->m_highChan - this->m_lowChan + 1); // Total number of samples to be collected (6 samples * # of channels)
-	this->m_Rate = 100000 / (this->m_highChan - this->m_lowChan + 1); // Rate that samples are collected per channel
-	this->m_MemHandle = cbWinBufAlloc(this->m_Count);
-	this->m_ADData = (WORD*)this->m_MemHandle;
+	*/
 }
 
-void MCCDAQ::set_daq_units() {
-	std::string response;
+void MCCDAQ::set_daq_units(std::string unit, int index) {
+	this->m_channelUnits.at(index) = unit;
+
+	/*std::string response;
 	int channel = this->m_lowChan;
 	bool unitSet = false;
 
@@ -88,6 +129,7 @@ void MCCDAQ::set_daq_units() {
 		this->m_channelUnits.at(channel) = response;
 		channel++;
 	} while (channel <= this->m_highChan);
+	*/
 }
 
 void MCCDAQ::calibrate_daq() {
@@ -241,7 +283,7 @@ void MCCDAQ::calibrate_daq_automatically() {
 				} while (!validChannel);
 				do {
 					try {
-						cbVIn(BOARD_NUM, sampleChannel, this->m_Gain, &readVoltage, 0);
+						cbVIn(this->m_BoardNum, sampleChannel, this->m_Gain, &readVoltage, 0);
 						x_voltages.push_back(readVoltage);
 						std::cout << "The DAQ is reading " << x_voltages.back() << "V on channel " << sampleChannel << "." << std::endl;
 						std::cout << "Enter the corresponding unit (" << this->m_channelUnits.at(channelNum) << ") value (y-value) for point " << currentPoint << ": ";
@@ -274,11 +316,11 @@ void MCCDAQ::calibrate_daq_automatically() {
 }
 
 int MCCDAQ::get_board_status_single_port() {
-	this->m_BoardStatus = cbVIn(BOARD_NUM, this->m_lowChan, this->m_Gain, &this->m_Data, 0);
+	this->m_BoardStatus = cbVIn(this->m_BoardNum, this->m_lowChan, this->m_Gain, &this->m_Data, 0);
 	return this->m_BoardStatus;
 }
 int MCCDAQ::get_board_status_multiple_ports() {
-	this->m_BoardStatus = cbAInScan(BOARD_NUM, this->m_lowChan, this->m_highChan, this->m_Count, &this->m_Rate, this->m_Gain, this->m_MemHandle, CONVERTDATA);
+	this->m_BoardStatus = cbAInScan(this->m_BoardNum, this->m_lowChan, this->m_highChan, this->m_Count, &this->m_Rate, this->m_Gain, this->m_MemHandle, CONVERTDATA);
 	return this->m_BoardStatus;
 }
 
@@ -288,7 +330,7 @@ void MCCDAQ::collect_data(std::vector<std::string> fileNames) {
 		//printf("MCC: \n");
 		for (int i = 0; (i < this->m_Count); i++)
 		{
-			cbToEngUnits(BOARD_NUM, this->m_Gain, this->m_ADData[i], &this->m_EngUnits);
+			cbToEngUnits(this->m_BoardNum, this->m_Gain, this->m_ADData[i], &this->m_EngUnits);
 			if (portNum > this->m_highChan) {
 				portNum = this->m_lowChan;
 			}

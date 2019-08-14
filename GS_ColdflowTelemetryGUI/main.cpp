@@ -1,7 +1,7 @@
 ﻿#define AMBIENT_PRESSURE 14.696
 #define BOARD_NUM 0
 
-#include "MCCDAQ.h"
+//#include "MCCDAQ.h"
 #include "SerialPort.h"
 //#include "cbw.h"
 
@@ -15,7 +15,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string>
+
 #include <algorithm>
 #include <conio.h>
 #include <iomanip>
@@ -380,7 +380,7 @@ int printDAQStatus(int BoardStatus) {
 
 int main(int argc, char* argv[]) {
 	// Set up DAQ
-	MCCDAQ daq(BIP10VOLTS, 0, 0, 6, 100000);
+	//MCCDAQ daq(BIP10VOLTS, 0, 0, 6, 100000);
 
 	vector<string> fileNames;
 
