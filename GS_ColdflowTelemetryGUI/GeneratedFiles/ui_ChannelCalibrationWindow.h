@@ -95,7 +95,7 @@ public:
     QHBoxLayout *horizontalLayout_4;
     QLabel *yinterceptLabel;
     QLabel *yinterceptLabelDynamic;
-    QPushButton *pushButton;
+    QPushButton *calibrateButton;
     QDialogButtonBox *buttonBox;
 
     void setupUi(QWidget *ChannelCalibrationWindow)
@@ -155,8 +155,8 @@ public:
         point6yValuesDoubleSpinBox->setObjectName(QString::fromUtf8("point6yValuesDoubleSpinBox"));
         point6yValuesDoubleSpinBox->setEnabled(false);
         point6yValuesDoubleSpinBox->setDecimals(7);
-        point6yValuesDoubleSpinBox->setMinimum(-1000.000000000000000);
-        point6yValuesDoubleSpinBox->setMaximum(999.990000000000009);
+        point6yValuesDoubleSpinBox->setMinimum(-99999.999999000006937);
+        point6yValuesDoubleSpinBox->setMaximum(99999.999999000006937);
 
         gridLayout->addWidget(point6yValuesDoubleSpinBox, 6, 2, 1, 1);
 
@@ -164,8 +164,8 @@ public:
         point5xValuesDoubleSpinBox->setObjectName(QString::fromUtf8("point5xValuesDoubleSpinBox"));
         point5xValuesDoubleSpinBox->setEnabled(false);
         point5xValuesDoubleSpinBox->setDecimals(7);
-        point5xValuesDoubleSpinBox->setMinimum(-1000.000000000000000);
-        point5xValuesDoubleSpinBox->setMaximum(999.990000000000009);
+        point5xValuesDoubleSpinBox->setMinimum(-99999.999999000006937);
+        point5xValuesDoubleSpinBox->setMaximum(99999.999999000006937);
 
         gridLayout->addWidget(point5xValuesDoubleSpinBox, 5, 1, 1, 1);
 
@@ -173,8 +173,8 @@ public:
         point9yValuesDoubleSpinBox->setObjectName(QString::fromUtf8("point9yValuesDoubleSpinBox"));
         point9yValuesDoubleSpinBox->setEnabled(false);
         point9yValuesDoubleSpinBox->setDecimals(7);
-        point9yValuesDoubleSpinBox->setMinimum(-1000.000000000000000);
-        point9yValuesDoubleSpinBox->setMaximum(999.990000000000009);
+        point9yValuesDoubleSpinBox->setMinimum(-99999.999999000006937);
+        point9yValuesDoubleSpinBox->setMaximum(99999.999999000006937);
 
         gridLayout->addWidget(point9yValuesDoubleSpinBox, 9, 2, 1, 1);
 
@@ -199,8 +199,8 @@ public:
         point10xValuesDoubleSpinBox->setObjectName(QString::fromUtf8("point10xValuesDoubleSpinBox"));
         point10xValuesDoubleSpinBox->setEnabled(false);
         point10xValuesDoubleSpinBox->setDecimals(7);
-        point10xValuesDoubleSpinBox->setMinimum(-1000.000000000000000);
-        point10xValuesDoubleSpinBox->setMaximum(999.990000000000009);
+        point10xValuesDoubleSpinBox->setMinimum(-99999.999999000006937);
+        point10xValuesDoubleSpinBox->setMaximum(99999.999999000006937);
 
         gridLayout->addWidget(point10xValuesDoubleSpinBox, 10, 1, 1, 1);
 
@@ -214,8 +214,8 @@ public:
         point7yValuesDoubleSpinBox->setObjectName(QString::fromUtf8("point7yValuesDoubleSpinBox"));
         point7yValuesDoubleSpinBox->setEnabled(false);
         point7yValuesDoubleSpinBox->setDecimals(7);
-        point7yValuesDoubleSpinBox->setMinimum(-1000.000000000000000);
-        point7yValuesDoubleSpinBox->setMaximum(999.990000000000009);
+        point7yValuesDoubleSpinBox->setMinimum(-99999.999999000006937);
+        point7yValuesDoubleSpinBox->setMaximum(99999.999999000006937);
 
         gridLayout->addWidget(point7yValuesDoubleSpinBox, 7, 2, 1, 1);
 
@@ -228,8 +228,8 @@ public:
         point4yValuesDoubleSpinBox->setObjectName(QString::fromUtf8("point4yValuesDoubleSpinBox"));
         point4yValuesDoubleSpinBox->setEnabled(false);
         point4yValuesDoubleSpinBox->setDecimals(7);
-        point4yValuesDoubleSpinBox->setMinimum(-1000.000000000000000);
-        point4yValuesDoubleSpinBox->setMaximum(999.990000000000009);
+        point4yValuesDoubleSpinBox->setMinimum(-99999.999999000006937);
+        point4yValuesDoubleSpinBox->setMaximum(99999.999999000006937);
 
         gridLayout->addWidget(point4yValuesDoubleSpinBox, 4, 2, 1, 1);
 
@@ -244,8 +244,8 @@ public:
         point7xValuesDoubleSpinBox->setObjectName(QString::fromUtf8("point7xValuesDoubleSpinBox"));
         point7xValuesDoubleSpinBox->setEnabled(false);
         point7xValuesDoubleSpinBox->setDecimals(7);
-        point7xValuesDoubleSpinBox->setMinimum(-1000.000000000000000);
-        point7xValuesDoubleSpinBox->setMaximum(999.990000000000009);
+        point7xValuesDoubleSpinBox->setMinimum(-99999.999999000006937);
+        point7xValuesDoubleSpinBox->setMaximum(99999.999999000006937);
 
         gridLayout->addWidget(point7xValuesDoubleSpinBox, 7, 1, 1, 1);
 
@@ -253,8 +253,8 @@ public:
         point5yValuesDoubleSpinBox->setObjectName(QString::fromUtf8("point5yValuesDoubleSpinBox"));
         point5yValuesDoubleSpinBox->setEnabled(false);
         point5yValuesDoubleSpinBox->setDecimals(7);
-        point5yValuesDoubleSpinBox->setMinimum(-1000.000000000000000);
-        point5yValuesDoubleSpinBox->setMaximum(999.990000000000009);
+        point5yValuesDoubleSpinBox->setMinimum(-99999.999999000006937);
+        point5yValuesDoubleSpinBox->setMaximum(99999.999999000006937);
 
         gridLayout->addWidget(point5yValuesDoubleSpinBox, 5, 2, 1, 1);
 
@@ -293,8 +293,8 @@ public:
         point3xValuesDoubleSpinBox->setObjectName(QString::fromUtf8("point3xValuesDoubleSpinBox"));
         point3xValuesDoubleSpinBox->setEnabled(false);
         point3xValuesDoubleSpinBox->setDecimals(7);
-        point3xValuesDoubleSpinBox->setMinimum(-1000.000000000000000);
-        point3xValuesDoubleSpinBox->setMaximum(999.990000000000009);
+        point3xValuesDoubleSpinBox->setMinimum(-99999.999999000006937);
+        point3xValuesDoubleSpinBox->setMaximum(99999.999999000006937);
 
         gridLayout->addWidget(point3xValuesDoubleSpinBox, 3, 1, 1, 1);
 
@@ -307,8 +307,8 @@ public:
         point8yValuesDoubleSpinBox->setObjectName(QString::fromUtf8("point8yValuesDoubleSpinBox"));
         point8yValuesDoubleSpinBox->setEnabled(false);
         point8yValuesDoubleSpinBox->setDecimals(7);
-        point8yValuesDoubleSpinBox->setMinimum(-1000.000000000000000);
-        point8yValuesDoubleSpinBox->setMaximum(999.990000000000009);
+        point8yValuesDoubleSpinBox->setMinimum(-99999.999999000006937);
+        point8yValuesDoubleSpinBox->setMaximum(99999.999999000006937);
 
         gridLayout->addWidget(point8yValuesDoubleSpinBox, 8, 2, 1, 1);
 
@@ -344,8 +344,8 @@ public:
         point1yValuesDoubleSpinBox = new QDoubleSpinBox(ChannelCalibrationWindow);
         point1yValuesDoubleSpinBox->setObjectName(QString::fromUtf8("point1yValuesDoubleSpinBox"));
         point1yValuesDoubleSpinBox->setDecimals(7);
-        point1yValuesDoubleSpinBox->setMinimum(-1000.000000000000000);
-        point1yValuesDoubleSpinBox->setMaximum(999.990000000000009);
+        point1yValuesDoubleSpinBox->setMinimum(-99999.999999000006937);
+        point1yValuesDoubleSpinBox->setMaximum(99999.999999000006937);
 
         gridLayout->addWidget(point1yValuesDoubleSpinBox, 1, 2, 1, 1);
 
@@ -353,16 +353,16 @@ public:
         point6xValuesDoubleSpinBox->setObjectName(QString::fromUtf8("point6xValuesDoubleSpinBox"));
         point6xValuesDoubleSpinBox->setEnabled(false);
         point6xValuesDoubleSpinBox->setDecimals(7);
-        point6xValuesDoubleSpinBox->setMinimum(-1000.000000000000000);
-        point6xValuesDoubleSpinBox->setMaximum(999.990000000000009);
+        point6xValuesDoubleSpinBox->setMinimum(-99999.999999000006937);
+        point6xValuesDoubleSpinBox->setMaximum(99999.999999000006937);
 
         gridLayout->addWidget(point6xValuesDoubleSpinBox, 6, 1, 1, 1);
 
         point2yValuesDoubleSpinBox = new QDoubleSpinBox(ChannelCalibrationWindow);
         point2yValuesDoubleSpinBox->setObjectName(QString::fromUtf8("point2yValuesDoubleSpinBox"));
         point2yValuesDoubleSpinBox->setDecimals(7);
-        point2yValuesDoubleSpinBox->setMinimum(-1000.000000000000000);
-        point2yValuesDoubleSpinBox->setMaximum(999.990000000000009);
+        point2yValuesDoubleSpinBox->setMinimum(-99999.999999000006937);
+        point2yValuesDoubleSpinBox->setMaximum(99999.999999000006937);
 
         gridLayout->addWidget(point2yValuesDoubleSpinBox, 2, 2, 1, 1);
 
@@ -376,16 +376,16 @@ public:
         point4xValuesDoubleSpinBox->setObjectName(QString::fromUtf8("point4xValuesDoubleSpinBox"));
         point4xValuesDoubleSpinBox->setEnabled(false);
         point4xValuesDoubleSpinBox->setDecimals(7);
-        point4xValuesDoubleSpinBox->setMinimum(-1000.000000000000000);
-        point4xValuesDoubleSpinBox->setMaximum(999.990000000000009);
+        point4xValuesDoubleSpinBox->setMinimum(-99999.999999000006937);
+        point4xValuesDoubleSpinBox->setMaximum(99999.999999000006937);
 
         gridLayout->addWidget(point4xValuesDoubleSpinBox, 4, 1, 1, 1);
 
         point1xValuesDoubleSpinBox = new QDoubleSpinBox(ChannelCalibrationWindow);
         point1xValuesDoubleSpinBox->setObjectName(QString::fromUtf8("point1xValuesDoubleSpinBox"));
         point1xValuesDoubleSpinBox->setDecimals(7);
-        point1xValuesDoubleSpinBox->setMinimum(-1000.000000000000000);
-        point1xValuesDoubleSpinBox->setMaximum(999.990000000000009);
+        point1xValuesDoubleSpinBox->setMinimum(-99999.999999000006937);
+        point1xValuesDoubleSpinBox->setMaximum(99999.999999000006937);
 
         gridLayout->addWidget(point1xValuesDoubleSpinBox, 1, 1, 1, 1);
 
@@ -399,8 +399,8 @@ public:
         point10yValuesDoubleSpinBox->setObjectName(QString::fromUtf8("point10yValuesDoubleSpinBox"));
         point10yValuesDoubleSpinBox->setEnabled(false);
         point10yValuesDoubleSpinBox->setDecimals(7);
-        point10yValuesDoubleSpinBox->setMinimum(-1000.000000000000000);
-        point10yValuesDoubleSpinBox->setMaximum(999.990000000000009);
+        point10yValuesDoubleSpinBox->setMinimum(-99999.999999000006937);
+        point10yValuesDoubleSpinBox->setMaximum(99999.999999000006937);
 
         gridLayout->addWidget(point10yValuesDoubleSpinBox, 10, 2, 1, 1);
 
@@ -414,8 +414,8 @@ public:
         point8xValuesDoubleSpinBox->setObjectName(QString::fromUtf8("point8xValuesDoubleSpinBox"));
         point8xValuesDoubleSpinBox->setEnabled(false);
         point8xValuesDoubleSpinBox->setDecimals(7);
-        point8xValuesDoubleSpinBox->setMinimum(-1000.000000000000000);
-        point8xValuesDoubleSpinBox->setMaximum(999.990000000000009);
+        point8xValuesDoubleSpinBox->setMinimum(-99999.999999000006937);
+        point8xValuesDoubleSpinBox->setMaximum(99999.999999000006937);
 
         gridLayout->addWidget(point8xValuesDoubleSpinBox, 8, 1, 1, 1);
 
@@ -454,16 +454,16 @@ public:
         point3yValuesDoubleSpinBox->setObjectName(QString::fromUtf8("point3yValuesDoubleSpinBox"));
         point3yValuesDoubleSpinBox->setEnabled(false);
         point3yValuesDoubleSpinBox->setDecimals(7);
-        point3yValuesDoubleSpinBox->setMinimum(-1000.000000000000000);
-        point3yValuesDoubleSpinBox->setMaximum(999.990000000000009);
+        point3yValuesDoubleSpinBox->setMinimum(-99999.999999000006937);
+        point3yValuesDoubleSpinBox->setMaximum(99999.999999000006937);
 
         gridLayout->addWidget(point3yValuesDoubleSpinBox, 3, 2, 1, 1);
 
         point2xValuesDoubleSpinBox = new QDoubleSpinBox(ChannelCalibrationWindow);
         point2xValuesDoubleSpinBox->setObjectName(QString::fromUtf8("point2xValuesDoubleSpinBox"));
         point2xValuesDoubleSpinBox->setDecimals(7);
-        point2xValuesDoubleSpinBox->setMinimum(-1000.000000000000000);
-        point2xValuesDoubleSpinBox->setMaximum(999.990000000000009);
+        point2xValuesDoubleSpinBox->setMinimum(-99999.999999000006937);
+        point2xValuesDoubleSpinBox->setMaximum(99999.999999000006937);
 
         gridLayout->addWidget(point2xValuesDoubleSpinBox, 2, 1, 1, 1);
 
@@ -501,8 +501,8 @@ public:
         point9xValuesDoubleSpinBox->setObjectName(QString::fromUtf8("point9xValuesDoubleSpinBox"));
         point9xValuesDoubleSpinBox->setEnabled(false);
         point9xValuesDoubleSpinBox->setDecimals(7);
-        point9xValuesDoubleSpinBox->setMinimum(-1000.000000000000000);
-        point9xValuesDoubleSpinBox->setMaximum(999.990000000000009);
+        point9xValuesDoubleSpinBox->setMinimum(-99999.999999000006937);
+        point9xValuesDoubleSpinBox->setMaximum(99999.999999000006937);
 
         gridLayout->addWidget(point9xValuesDoubleSpinBox, 9, 1, 1, 1);
 
@@ -563,10 +563,10 @@ public:
 
         horizontalLayout_5->addLayout(verticalLayout);
 
-        pushButton = new QPushButton(ChannelCalibrationWindow);
-        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        calibrateButton = new QPushButton(ChannelCalibrationWindow);
+        calibrateButton->setObjectName(QString::fromUtf8("calibrateButton"));
 
-        horizontalLayout_5->addWidget(pushButton);
+        horizontalLayout_5->addWidget(calibrateButton);
 
 
         verticalLayout_2->addLayout(horizontalLayout_5);
@@ -616,7 +616,7 @@ public:
         slopeLabelDynamic->setText(QCoreApplication::translate("ChannelCalibrationWindow", "Not calculated", nullptr));
         yinterceptLabel->setText(QCoreApplication::translate("ChannelCalibrationWindow", "y-intercept:", nullptr));
         yinterceptLabelDynamic->setText(QCoreApplication::translate("ChannelCalibrationWindow", "Not calculated", nullptr));
-        pushButton->setText(QCoreApplication::translate("ChannelCalibrationWindow", "Calibrate", nullptr));
+        calibrateButton->setText(QCoreApplication::translate("ChannelCalibrationWindow", "Calibrate", nullptr));
     } // retranslateUi
 
 };

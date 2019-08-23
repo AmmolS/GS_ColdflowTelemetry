@@ -74,10 +74,10 @@
         <number>7</number>
        </property>
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>-99999.999999000006937</double>
        </property>
        <property name="maximum">
-        <double>999.990000000000009</double>
+        <double>99999.999999000006937</double>
        </property>
       </widget>
      </item>
@@ -90,10 +90,10 @@
         <number>7</number>
        </property>
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>-99999.999999000006937</double>
        </property>
        <property name="maximum">
-        <double>999.990000000000009</double>
+        <double>99999.999999000006937</double>
        </property>
       </widget>
      </item>
@@ -106,10 +106,10 @@
         <number>7</number>
        </property>
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>-99999.999999000006937</double>
        </property>
        <property name="maximum">
-        <double>999.990000000000009</double>
+        <double>99999.999999000006937</double>
        </property>
       </widget>
      </item>
@@ -149,10 +149,10 @@
         <number>7</number>
        </property>
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>-99999.999999000006937</double>
        </property>
        <property name="maximum">
-        <double>999.990000000000009</double>
+        <double>99999.999999000006937</double>
        </property>
       </widget>
      </item>
@@ -175,10 +175,10 @@
         <number>7</number>
        </property>
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>-99999.999999000006937</double>
        </property>
        <property name="maximum">
-        <double>999.990000000000009</double>
+        <double>99999.999999000006937</double>
        </property>
       </widget>
      </item>
@@ -198,10 +198,10 @@
         <number>7</number>
        </property>
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>-99999.999999000006937</double>
        </property>
        <property name="maximum">
-        <double>999.990000000000009</double>
+        <double>99999.999999000006937</double>
        </property>
       </widget>
      </item>
@@ -224,10 +224,10 @@
         <number>7</number>
        </property>
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>-99999.999999000006937</double>
        </property>
        <property name="maximum">
-        <double>999.990000000000009</double>
+        <double>99999.999999000006937</double>
        </property>
       </widget>
      </item>
@@ -240,10 +240,10 @@
         <number>7</number>
        </property>
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>-99999.999999000006937</double>
        </property>
        <property name="maximum">
-        <double>999.990000000000009</double>
+        <double>99999.999999000006937</double>
        </property>
       </widget>
      </item>
@@ -306,10 +306,10 @@
         <number>7</number>
        </property>
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>-99999.999999000006937</double>
        </property>
        <property name="maximum">
-        <double>999.990000000000009</double>
+        <double>99999.999999000006937</double>
        </property>
       </widget>
      </item>
@@ -329,10 +329,10 @@
         <number>7</number>
        </property>
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>-99999.999999000006937</double>
        </property>
        <property name="maximum">
-        <double>999.990000000000009</double>
+        <double>99999.999999000006937</double>
        </property>
       </widget>
      </item>
@@ -386,10 +386,10 @@
         <number>7</number>
        </property>
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>-99999.999999000006937</double>
        </property>
        <property name="maximum">
-        <double>999.990000000000009</double>
+        <double>99999.999999000006937</double>
        </property>
       </widget>
      </item>
@@ -402,10 +402,10 @@
         <number>7</number>
        </property>
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>-99999.999999000006937</double>
        </property>
        <property name="maximum">
-        <double>999.990000000000009</double>
+        <double>99999.999999000006937</double>
        </property>
       </widget>
      </item>
@@ -415,10 +415,10 @@
         <number>7</number>
        </property>
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>-99999.999999000006937</double>
        </property>
        <property name="maximum">
-        <double>999.990000000000009</double>
+        <double>99999.999999000006937</double>
        </property>
       </widget>
      </item>
@@ -441,10 +441,10 @@
         <number>7</number>
        </property>
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>-99999.999999000006937</double>
        </property>
        <property name="maximum">
-        <double>999.990000000000009</double>
+        <double>99999.999999000006937</double>
        </property>
       </widget>
      </item>
@@ -454,10 +454,10 @@
         <number>7</number>
        </property>
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>-99999.999999000006937</double>
        </property>
        <property name="maximum">
-        <double>999.990000000000009</double>
+        <double>99999.999999000006937</double>
        </property>
       </widget>
      </item>
@@ -480,10 +480,10 @@
         <number>7</number>
        </property>
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>-99999.999999000006937</double>
        </property>
        <property name="maximum">
-        <double>999.990000000000009</double>
+        <double>99999.999999000006937</double>
        </property>
       </widget>
      </item>
@@ -503,10 +503,10 @@
         <number>7</number>
        </property>
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>-99999.999999000006937</double>
        </property>
        <property name="maximum">
-        <double>999.990000000000009</double>
+        <double>99999.999999000006937</double>
        </property>
       </widget>
      </item>
@@ -566,10 +566,10 @@
         <number>7</number>
        </property>
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>-99999.999999000006937</double>
        </property>
        <property name="maximum">
-        <double>999.990000000000009</double>
+        <double>99999.999999000006937</double>
        </property>
       </widget>
      </item>
@@ -579,10 +579,10 @@
         <number>7</number>
        </property>
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>-99999.999999000006937</double>
        </property>
        <property name="maximum">
-        <double>999.990000000000009</double>
+        <double>99999.999999000006937</double>
        </property>
       </widget>
      </item>
@@ -642,10 +642,10 @@
         <number>7</number>
        </property>
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>-99999.999999000006937</double>
        </property>
        <property name="maximum">
-        <double>999.990000000000009</double>
+        <double>99999.999999000006937</double>
        </property>
       </widget>
      </item>
@@ -711,7 +711,7 @@
       </layout>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="calibrateButton">
        <property name="text">
         <string>Calibrate</string>
        </property>

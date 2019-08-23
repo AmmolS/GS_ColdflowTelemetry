@@ -12,7 +12,7 @@ MCCDAQ::MCCDAQ() {
 	this->m_ADData = (WORD*)m_MemHandle;
 
 	this->m_channelUnits.assign(8, "");
-	this->m_linearCalibration.assign(8, std::vector<float>(2));
+	this->m_linearCalibration.assign(8, std::vector<double>(2));
 
 	for (size_t i = 0; i < this->m_linearCalibration.size(); i++) {
 		this->m_linearCalibration[i][0] = 50; // Sample slope
@@ -32,7 +32,7 @@ MCCDAQ::MCCDAQ(int boardNum, int Gain, int lowChan, int highChan, long Count, lo
 	this->m_ADData = (WORD*)m_MemHandle;
 
 	this->m_channelUnits.assign(8, "");
-	this->m_linearCalibration.assign(8, std:: vector<float>(2));
+	this->m_linearCalibration.assign(8, std:: vector<double>(2));
 
 	for (size_t i = 0; i < this->m_linearCalibration.size(); i++) {
 		this->m_linearCalibration[i][0] = 50; // Sample slope
@@ -40,14 +40,14 @@ MCCDAQ::MCCDAQ(int boardNum, int Gain, int lowChan, int highChan, long Count, lo
 	}
 }
 
-bool MCCDAQ::linear_regression(int numOfPoints, std::vector<float> x_voltages, std::vector<float> y_units, float *slope, float *y_intercept) {
-	float numerator = 0;
-	float denominator = 0;
-	float xMean = 0;
-	float yMean = 0;
+bool MCCDAQ::linear_regression(int numOfPoints, std::vector<double> x_voltages, std::vector<double> y_units, double *slope, double *y_intercept) {
+	double numerator = 0;
+	double denominator = 0;
+	double xMean = 0;
+	double yMean = 0;
 
-	xMean = std::accumulate(x_voltages.begin(), x_voltages.end(), (float)0.0) / x_voltages.size();
-	yMean = std::accumulate(y_units.begin(), y_units.end(), (float)0.0) / y_units.size();
+	xMean = std::accumulate(x_voltages.begin(), x_voltages.end(), 0.0) / x_voltages.size();
+	yMean = std::accumulate(y_units.begin(), y_units.end(), 0.0) / y_units.size();
 	for (int i = 0; i < numOfPoints; i++) {
 		numerator += (x_voltages.at(i) - xMean)*(y_units.at(i) - yMean);
 		denominator += pow((x_voltages.at(i) - xMean), 2);
@@ -132,7 +132,13 @@ void MCCDAQ::set_daq_units(std::string unit, int index) {
 	*/
 }
 
-void MCCDAQ::calibrate_daq() {
+void MCCDAQ::calibrate_daq_channel(int channelNum, double slope, double y_intercept) {
+
+	this->m_linearCalibration.at(channelNum).at(0) = slope;
+	this->m_linearCalibration.at(channelNum).at(1) = y_intercept;
+
+
+	/*
 	std::cout << "The DAQ can be calibrated in two ways:" << std::endl;
 	std::cout << "a. Manually - voltages (x-values) and the corresponding value of the desired units (y-values) would each be inputted individiually" << std::endl;
 	std::cout << "b. Automatically - the DAQ would read a voltage (x-value) from a channel and the corresponding value of the desired unit (y-value) would be inputted by the user" << std::endl;
@@ -147,6 +153,7 @@ void MCCDAQ::calibrate_daq() {
 			this->calibrate_daq_automatically();
 		}
 	} while (response != "a" && response != "b");
+	*/
 }
 
 void MCCDAQ::calibrate_daq_manually() {
@@ -159,8 +166,8 @@ void MCCDAQ::calibrate_daq_manually() {
 	bool validXPoint = false;
 	bool validYPoint = false;
 
-	std::vector<float> x_voltages;
-	std::vector<float> y_units;
+	std::vector<double> x_voltages;
+	std::vector<double> y_units;
 
 	int channelNum = this->m_lowChan;
 	std::cout << std::endl << "A set of inputted voltages (x-values) will be calibrated with a set of inputted units (y-values) (ex. -10 V and 14.696 P)." << std::endl;
@@ -239,8 +246,8 @@ void MCCDAQ::calibrate_daq_automatically() {
 	bool validChannel = false;
 	bool validYPoint = false;
 
-	std::vector<float> x_voltages;
-	std::vector<float> y_units;
+	std::vector<double> x_voltages;
+	std::vector<double> y_units;
 
 	int channelNum = this->m_lowChan;
 	std::cout << std::endl << "A voltage (x-value) will be read from a selected port, and the corresponding value for the unit (y-value) would be inputted (ex. -10 V and 14.696 P)." << std::endl;
@@ -400,6 +407,15 @@ std::vector<double> MCCDAQ::get_daq_data() {
 }
 std::vector<std::string> MCCDAQ::get_channel_units() {
 	return this->m_channelUnits;
+}
+std::vector<std::vector<double>> MCCDAQ::get_linear_calibration() {
+	return this->m_linearCalibration;
+}
+int MCCDAQ::get_board_num() {
+	return this->m_BoardNum;
+}
+int MCCDAQ::get_gain() {
+	return this->m_Gain;
 }
 int MCCDAQ::get_low_chan() {
 	return this->m_lowChan;

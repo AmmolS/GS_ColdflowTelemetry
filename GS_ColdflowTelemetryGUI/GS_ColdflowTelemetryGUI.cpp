@@ -12,11 +12,21 @@ GS_ColdflowTelemetryGUI::GS_ColdflowTelemetryGUI(QWidget *parent)
 	ui.lowerChannelInput->setValidator(validChannel);
 	ui.higherChannelInput->setValidator(validChannel);
 
+	this->calibrationDataSet.assign(8, std::vector<std::vector<double>>(2, std::vector<double>(10, 0)));
+	this->channelCalibrated.assign(8, false);
+
 	connect(ui.validateDAQButton, SIGNAL(clicked()), this, SLOT(checkDaqStatus()));
 	connect(ui.confirmChannelsButton, SIGNAL(clicked()), this, SLOT(validateChannels()));
 	connect(ui.confirmUnitsButton, SIGNAL(clicked()), this, SLOT(validateUnits()));
 
 	connect(ui.channel0CalibrateButton, &QPushButton::clicked, [this]() {calibrateChannel(0);});
+	connect(ui.channel1CalibrateButton, &QPushButton::clicked, [this]() {calibrateChannel(1); });
+	connect(ui.channel2CalibrateButton, &QPushButton::clicked, [this]() {calibrateChannel(2); });
+	connect(ui.channel3CalibrateButton, &QPushButton::clicked, [this]() {calibrateChannel(3); });
+	connect(ui.channel4CalibrateButton, &QPushButton::clicked, [this]() {calibrateChannel(4); });
+	connect(ui.channel5CalibrateButton, &QPushButton::clicked, [this]() {calibrateChannel(5); });
+	connect(ui.channel6CalibrateButton, &QPushButton::clicked, [this]() {calibrateChannel(6); });
+	connect(ui.channel7CalibrateButton, &QPushButton::clicked, [this]() {calibrateChannel(7); });
 		
 	
 	//connect(ui.lowerChannelInput, SIGNAL(editingFinished()), ui.lowerChannelInput, SLOT(test = ui.lowerChannelInput->text()));
@@ -111,7 +121,7 @@ void GS_ColdflowTelemetryGUI::checkDaqStatus() {
 	int BoardStatus = daq.get_board_status_single_port();
 	std::string text;
 
-	BoardStatus = 0; // TEMP
+	//BoardStatus = 0; // TEMP
 	
 	updateUnitInputFrame(false, 0, 7);
 	enableChannelNumInput(false);
@@ -219,9 +229,47 @@ void GS_ColdflowTelemetryGUI::updateChannelCalibrationButtons(bool shouldEnable,
 }
 
 void GS_ColdflowTelemetryGUI::calibrateChannel(int channel) {
-	ChannelCalibrationWindow calibrateChannelWindow(channel, this->daq);
-	calibrateChannelWindow.setModal(true);
-	calibrateChannelWindow.exec();
+	ChannelCalibrationWindow calibrateChannelWindow(channel, this->daq, &calibrationDataSet.at(channel), channelCalibrated.at(channel));
+	//calibrateChannelWindow.setModal(true);
+
+	//connect(&calibrateChannelWindow, SIGNAL(rejected()), this, SLOT(lower()));
+
+	//connect(&calibrateChannelWindow, &QDialog::accepted, [this]() {ui.channel0CalibrateButton->setText("Calibrated"); });
+	//connect(&calibrateChannelWindow, &QDialog::rejected, [this]() {ui.channel0CalibrateButton->setText("Not calibrated"); });
+
+	int status = calibrateChannelWindow.exec();
 
 
+	if (status == QDialog::Accepted && channel == 0) {
+		ui.channel0CalibrateButton->setText("Calibrated");
+		channelCalibrated.at(channel) = true;
+	}
+	else if (status == QDialog::Accepted && channel == 1) {
+		ui.channel1CalibrateButton->setText("Calibrated");
+		channelCalibrated.at(channel) = true;
+	}
+	else if (status == QDialog::Accepted && channel == 2) {
+		ui.channel2CalibrateButton->setText("Calibrated");
+		channelCalibrated.at(channel) = true;
+	}
+	else if (status == QDialog::Accepted && channel == 3) {
+		ui.channel3CalibrateButton->setText("Calibrated");
+		channelCalibrated.at(channel) = true;
+	}
+	else if (status == QDialog::Accepted && channel == 4) {
+		ui.channel4CalibrateButton->setText("Calibrated");
+		channelCalibrated.at(channel) = true;
+	}
+	else if (status == QDialog::Accepted && channel == 5) {
+		ui.channel5CalibrateButton->setText("Calibrated");
+		channelCalibrated.at(channel) = true;
+	}
+	else if (status == QDialog::Accepted && channel == 6) {
+		ui.channel6CalibrateButton->setText("Calibrated");
+		channelCalibrated.at(channel) = true;
+	}
+	else if (status == QDialog::Accepted && channel == 7) {
+		ui.channel7CalibrateButton->setText("Calibrated");
+		channelCalibrated.at(channel) = true;
+	}
 }

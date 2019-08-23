@@ -30,4 +30,7 @@ private:
 
 	QIntValidator *validChannel;
 	MCCDAQ daq;
+
+	std::vector<std::vector<std::vector<double>>> calibrationDataSet; // dataset.at(#).at(#).at(#) = channel number > x or y > data value
+	std::vector<bool> channelCalibrated;
 };
